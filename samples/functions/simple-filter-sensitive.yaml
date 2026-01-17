@@ -1,0 +1,20 @@
+# Simple Function to Filter Sensitive Data
+
+name: "cli-filter-sensitive"
+function: |
+  # Remove sensitive fields
+  del(.password)
+  del(.api_key)
+  del(.token)
+  del(.credit_card)
+
+  # Mask email
+  if exists(.email) {
+    .email = replace(.email, r'@.*', "@***")
+  }
+
+  # Mask IP
+  if exists(.ip_address) {
+    .ip_address = replace(.ip_address, r'\.\d+$', ".***")
+  }
+  .

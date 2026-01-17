@@ -1,0 +1,17 @@
+# Email HTML Template for O2 CLI
+
+name: "cli-email-html"
+type: email
+title: "Alert Notification - {{alert_name}}"
+body: |
+  <html>
+  <body>
+    <h2>Alert Notification</h2>
+    <p><strong>Alert Name:</strong> {{alert_name}}</p>
+    <p><strong>Type:</strong> {{alert_type}}</p>
+    <p><strong>Count:</strong> {{alert_count}}</p>
+    <p><strong>Stream:</strong> {{stream_name}}</p>
+    <p><strong>Period:</strong> {{alert_period}} minutes</p>
+  </body>
+  </html>
+isBody: true

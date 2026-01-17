@@ -1,0 +1,13 @@
+# Simple VRL Function for O2 CLI
+# Parse JSON from log field
+
+name: "cli-parse-json"
+function: |
+  # Parse JSON from 'message' field
+  if exists(.message) {
+    parsed, err = parse_json(.message)
+    if err == null {
+      . = merge!(., parsed)  # Use infallible merge!
+    }
+  }
+  .

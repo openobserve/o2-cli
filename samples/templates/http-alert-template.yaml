@@ -1,0 +1,51 @@
+# ============================================================================
+#                 OpenObserve Alert Template - HTTP Type
+#                 Used for HTTP webhooks (Slack, PagerDuty, or custom endpoints)
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveAlertTemplate
+metadata:
+  name: http-alert-template      # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator          # Target namespace for the alert template resource
+spec:
+  configRef:
+    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
+
+  # Alert template configuration
+  name: "http-critical-alert"   # Unique identifier for the alert template (Required)
+  org: "dev"                     # Organization name (Optional, defaults to org from ConfigRef)
+
+  # Template content
+  title: "Critical Alert - {alert_name}"    # Title of the alert template (Required)
+
+  # Body template with placeholders for alert data
+  body: |
+    {
+      "alert": "{alert_name}",
+      "severity": "{severity}",
+      "stream": "{stream_name}",
+      "organization": "{org_name}",
+      "timestamp": "{timestamp}",
+      "triggered_at": "{triggered_at}",
+      "description": "{alert_description}",
+      "condition": {
+        "threshold": "{threshold}",
+        "actual_value": "{actual_value}",
+        "operator": "{operator}"
+      },
+      "environment": "{env}",
+      "details": {
+        "host": "{host}",
+        "service": "{service}",
+        "error_count": "{error_count}",
+        "message": "{message}"
+      },
+      "action_required": "Please investigate the {service} service on {host}",
+      "dashboard_link": "https://openobserve.example.com/dashboard/{dashboard_id}",
+      "runbook_url": "https://wiki.example.com/runbooks/{alert_name}"
+    }
+
+  type: "http"                  # Type of alert template (Required: http, slack, email, pagerduty, webhook)
+  isDefault: false              # Whether this is the default template for this type

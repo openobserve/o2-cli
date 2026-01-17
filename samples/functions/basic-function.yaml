@@ -1,0 +1,26 @@
+# ============================================================================
+#                     OpenObserve Basic Function Template
+#                     Minimal configuration for a function
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: basic-transformation         # Kubernetes resource name
+  namespace: o2operator              # Target namespace for the function resource
+spec:
+  configRef:
+    name: openobserve-main           # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator            # Namespace of the config (Optional, defaults to function namespace)
+
+  name: "basic_transformation"       # Function name in OpenObserve (Required)
+  org: "dev"                        # Organization name (Optional, uses configRef org if not specified)
+
+  # Simple VRL function to add a timestamp field
+  function: |
+    .processed_at = now()
+    .environment = "production"
+    .
+
+  test:
+    enabled: false

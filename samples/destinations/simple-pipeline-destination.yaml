@@ -1,0 +1,12 @@
+# Simple Pipeline Destination for O2 CLI
+# For sending data to other systems (Splunk, Elasticsearch, etc.)
+
+name: "cli-splunk-dest"
+type: http
+destinationTypeName: splunk  # splunk, elasticsearch, datadog, newrelic, etc.
+url: "https://splunk.company.com:8088/services/collector"
+method: post
+headers:
+  Authorization: "Splunk YOUR-HEC-TOKEN"
+  Content-Type: "application/json"
+skipTlsVerify: false

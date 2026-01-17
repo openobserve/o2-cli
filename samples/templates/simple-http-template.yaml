@@ -1,0 +1,16 @@
+# Simple HTTP Alert Template for O2 CLI
+# No Kubernetes fields needed!
+
+name: "cli-http-alert"
+type: http
+body: |
+  {
+    "alert_name": "{{alert_name}}",
+    "alert_type": "{{alert_type}}",
+    "alert_period": "{{alert_period}}",
+    "alert_operator": "{{alert_operator}}",
+    "alert_threshold": "{{alert_threshold}}",
+    "alert_count": "{{alert_count}}",
+    "stream_name": "{{stream_name}}"
+  }
+isBody: true

@@ -1,0 +1,18 @@
+# Slack Webhook Template for O2 CLI
+
+name: "cli-slack-alert"
+type: http
+body: |
+  {
+    "text": "🚨 Alert Triggered",
+    "blocks": [
+      {
+        "type": "section",
+        "text": {
+          "type": "mrkdwn",
+          "text": "*Alert:* {{alert_name}}\n*Count:* {{alert_count}}\n*Stream:*"
+        }
+      }
+    ]
+  }
+isBody: true

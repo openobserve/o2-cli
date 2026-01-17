@@ -1,0 +1,15 @@
+# Simple GeoIP Enrichment Function for O2 CLI
+
+name: "cli-geoip-enrich"
+function: |
+  # Add geo location from IP address
+  if exists(.client_ip) {
+    geo = get_enrichment_table_record("maxmind", { "ip": .client_ip })
+    if geo != null {
+      .geo_city = geo.city
+      .geo_country = geo.country
+      .geo_lat = geo.latitude
+      .geo_lon = geo.longitude
+    }
+  }
+  .

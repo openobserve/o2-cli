@@ -1,0 +1,157 @@
+# ============================================================================
+#                        OpenObserve Real-Time Alert Template
+#                        Alert Type: Custom with logs
+#                        Works for all streamType
+# ============================================================================
+
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveAlert
+metadata:
+  name: real-time-logs-alert  # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator       # Target namespace for the alert resource
+spec:
+  configRef:
+    name: openobserve-main         # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator      # Namespace of the config (Optional, defaults to alert namespace)
+
+  name: "real-time-logs-alert"
+  enabled: true
+  description: ""
+  streamName: "default"
+  streamType: "logs"
+  isRealTime: true
+  folderName: "test_alerts"
+  org: "dev"
+
+  queryCondition:
+    type: "custom"
+    # aggregation: null
+    # aggregation:
+    #   groupBy:
+    #     - "field1"
+    #     - "field2"
+    #   function: "count"
+    #   having:
+    #     column: "_count"         
+    #     operator: ">="          
+    #     value: 10              
+    #     ignoreCase: false       
+    # conditions: null
+    conditions:
+      or:
+        - column: job
+          operator: ">"
+          value: "11"
+          ignore_case: false
+        - or:
+            - column: level
+              operator: "="
+              value: "111"
+              ignore_case: true
+            - column: log
+              operator: "="
+              value: "122"
+              ignore_case: true
+    # sql: ""
+    # sql: |
+    #   SELECT
+    #     host,
+    #     service,
+    #     COUNT(*) as error_count,
+    #     MAX(response_time) as max_response_time
+    #   FROM stream
+    #   WHERE
+    #     level = 'ERROR'
+    #     AND _timestamp >= now() - INTERVAL '1 hour'
+    #   GROUP BY host, service
+    #   HAVING error_count > 10
+    #   ORDER BY error_count DESC
+    #   LIMIT 100
+    # vrlFunction: ""
+    # vrlFunction: |
+    #   .processed_at = now()
+    #   .alert_severity = if .error_count > 100 {
+    #     "critical"
+    #   } else if .error_count > 50 {
+    #     "warning"
+    #   } else {
+    #     "info"
+    #   }
+    #   .needs_immediate_action = .error_count > 100
+
+    # promql: ""
+    # promql: avg(rate(cpu_usage_seconds_total[5m])) by (instance) > 0.8
+
+    #   OR: Memory usage above 90%
+    #   (node_memory_MemTotal_bytes - node_memory_MemFree_bytes) / node_memory_MemTotal_bytes > 0.9
+
+    #   OR: HTTP error rate above 1%
+    #   sum(rate(http_requests_total{status=~"5.."}[5m])) / sum(rate(http_requests_total[5m])) > 0.01
+    # promqlCondition: 
+    #   column: "value"
+    #   operator: ">="
+    #   value: 10
+    #   ignore_case: false
+
+    # multiTimeRange: []
+    # multiTimeRange:
+    #   - offset: "30m"    
+    #   - offset: "1h"    
+    #   - offset: "3h"    
+    #   - offset: "6h"     
+    #   - offset: "1d"     
+    #   - offset: "7d"     
+
+  triggerCondition:
+    frequency: 5
+    frequencyType: "minutes"
+    period: 15
+    threshold: 10
+    operator: ">="
+    silence: 30                 #For real-time, only silence will work 
+    timezone: "UTC"
+    alignTime: true
+    cron: ""
+    toleranceInSecs: null
+
+#   deduplication:
+#     enabled: true
+#     fingerprintFields:
+#       - "host"           
+#       - "service"       
+#       - "error_code"     
+#     timeWindowMinutes: 60
+
+  destinations:
+    - "test-o2-alerts"      
+
+  contextAttributes:
+    - name: "environment"     
+      value: "production"      
+      key: "env"              
+    - name: "team"
+      value: "platform-engineering"
+      key: "team_name"
+    - name: "severity"
+      value: "critical"
+      key: "severity_level"
+    - name: "sla"
+      value: "99.99"
+      key: "sla_percentage"
+    - name: "cost_center"
+      value: "engineering-123"
+      key: "cost_center_id"
+
+  rowTemplate: |
+    Alert: {{level}} error detected
+    Service: {{service}}
+    Host: {{host}}
+    Error Count: {{_count}}
+    Environment: {{env}}
+    Time: {{_timestamp}}
+    Action: Check {{service}} logs on {{host}}
+
+  rowTemplateType: "String"
+
+  tzOffset: null

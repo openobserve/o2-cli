@@ -1,0 +1,7 @@
+# Simple VRL Function - Add a Field
+# Simplest possible VRL function
+
+name: "cli-add-environment"
+function: |
+  .environment = "production"
+  .

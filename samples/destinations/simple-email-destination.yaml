@@ -1,0 +1,8 @@
+# Simple Email Destination for O2 CLI
+
+name: "cli-email-alerts"
+type: email
+emails:
+  - "alerts@company.com"
+  - "oncall@company.com"
+template: "email-html-alert"  # Name of email template to use

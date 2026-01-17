@@ -1,0 +1,62 @@
+# ============================================================================
+#                 OpenObserve Alert Template - HTTP Type (Slack Webhook)
+#                 Used for sending alerts to Slack via HTTP webhook
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveAlertTemplate
+metadata:
+  name: http-slack-webhook-template  # Kubernetes resource name
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  # Alert template configuration
+  name: "slack-webhook-notification"    # Unique identifier for the alert template
+  org: "dev"                            # Organization name
+
+  # Template content
+  title: "Slack Alert: {alert_name}"  # Title of the alert template
+
+  # Slack webhook payload (HTTP type is used for all webhooks including Slack)
+  body: |
+    {
+      "text": "Alert triggered in {org_name}",
+      "attachments": [
+        {
+          "color": "danger",
+          "title": "{alert_name}",
+          "title_link": "https://openobserve.example.com/alerts/{alert_id}",
+          "text": "{alert_description}",
+          "fields": [
+            {
+              "title": "Severity",
+              "value": "{severity}",
+              "short": true
+            },
+            {
+              "title": "Stream",
+              "value": "{stream_name}",
+              "short": true
+            },
+            {
+              "title": "Triggered At",
+              "value": "{triggered_at}",
+              "short": true
+            },
+            {
+              "title": "Environment",
+              "value": "{env}",
+              "short": true
+            }
+          ],
+          "footer": "OpenObserve Alert",
+          "ts": "{timestamp_unix}"
+        }
+      ]
+    }
+
+  type: "http"                  # Type must be 'http' for webhook notifications
+  isDefault: false

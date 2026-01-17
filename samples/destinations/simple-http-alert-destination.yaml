@@ -1,0 +1,11 @@
+# Simple HTTP Alert Destination for O2 CLI
+# For webhooks (Slack, PagerDuty, Teams, etc.)
+
+name: "cli-slack-webhook"
+type: http
+url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+method: post
+headers:
+  Content-Type: "application/json"
+template: "slack-alert"  # Name of alert template to use
+skipTlsVerify: false
