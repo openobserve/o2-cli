@@ -2,7 +2,9 @@
 
 **Enterprise-Grade CLI for OpenObserve Management**
 
-Version: 1.0.0 | Status: Production-Ready ✅
+Version: 1.1.3 | Status: Production-Ready ✅
+
+⚠️ **Requires OpenObserve Enterprise** - O2 CLI only works with OpenObserve Enterprise edition.
 
 ---
 
@@ -23,6 +25,9 @@ Version: 1.0.0 | Status: Production-Ready ✅
 ## 🎯 Overview
 
 O2 CLI is a command-line interface for managing OpenObserve resources directly, similar to AWS CLI or kubectl. It provides an imperative way to manage OpenObserve alongside the declarative Kubernetes Operator.
+
+**⚠️ Enterprise Requirement:**
+O2 CLI requires **OpenObserve Enterprise** edition. It will not work with the community version. For Enterprise access, visit [openobserve.ai/pricing](https://openobserve.ai/pricing).
 
 **Why O2 CLI?**
 - ✅ Direct management without Kubernetes
@@ -84,6 +89,10 @@ alias o2='docker run -it --rm -v ~/.o2:/root/.o2 openobserve/o2:latest'
 
 ## 🚀 Quick Start
 
+### Prerequisites
+- OpenObserve Enterprise instance
+- Valid credentials (username/password or API token)
+
 ### 1. Configure
 ```bash
 # Setup default profile
@@ -94,6 +103,8 @@ o2 configure
 o2 configure --profile dev
 o2 configure --profile prod
 ```
+
+**Note:** The CLI will validate your OpenObserve instance is Enterprise edition on first command.
 
 ### 2. List Resources
 ```bash
