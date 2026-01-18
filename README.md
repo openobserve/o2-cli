@@ -67,22 +67,25 @@ O2 CLI requires **OpenObserve Enterprise** edition. It will not work with the co
 curl -fsSL https://raw.githubusercontent.com/openobserve/o2-operator/main/install.sh | bash
 ```
 
-### Homebrew
+### Homebrew (Recommended)
 ```bash
 brew tap openobserve/tap
 brew install o2
 ```
 
-### From Source
+### Download Binary Directly
 ```bash
-cd /path/to/o2-operator
-make install-cli
-```
+# macOS Apple Silicon
+curl -L https://github.com/openobserve/o2-cli/releases/latest/download/o2-darwin-arm64.tar.gz | tar xz
+sudo mv o2 /usr/local/bin/
 
-### Docker
-```bash
-docker pull openobserve/o2:latest
-alias o2='docker run -it --rm -v ~/.o2:/root/.o2 openobserve/o2:latest'
+# macOS Intel
+curl -L https://github.com/openobserve/o2-cli/releases/latest/download/o2-darwin-amd64.tar.gz | tar xz
+sudo mv o2 /usr/local/bin/
+
+# Linux AMD64
+curl -L https://github.com/openobserve/o2-cli/releases/latest/download/o2-linux-amd64.tar.gz | tar xz
+sudo mv o2 /usr/local/bin/
 ```
 
 ---

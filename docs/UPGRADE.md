@@ -109,21 +109,6 @@ rm o2.tar.gz README.md COMMANDS.md
 
 ---
 
-### Method 4: Go Install
-
-**For Go developers:**
-
-```bash
-# Install/upgrade to latest from source
-go install github.com/openobserve/o2-operator/cmd/cli@latest
-
-# Verify (binary in $GOPATH/bin, usually ~/go/bin)
-~/go/bin/o2 --version
-
-# Add to PATH if needed
-export PATH="$HOME/go/bin:$PATH"
-```
-
 ---
 
 ## 🔍 Verify Upgrade
