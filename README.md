@@ -64,7 +64,7 @@ O2 CLI requires **OpenObserve Enterprise** edition. It will not work with the co
 
 ### Quick Install (macOS/Linux)
 ```bash
-curl -fsSL https://raw.githubusercontent.com/openobserve/o2-operator/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/openobserve/o2-cli/main/install.sh | bash
 ```
 
 ### Homebrew (Recommended)

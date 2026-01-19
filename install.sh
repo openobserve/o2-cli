@@ -58,8 +58,8 @@ if [ "$VERSION" = "latest" ]; then
     echo "Latest version: $VERSION"
 fi
 
-# Build download URL
-FILENAME="o2_${VERSION#v}_${OS}_${ARCH}.tar.gz"
+# Build download URL - matches GoReleaser naming format
+FILENAME="o2-${OS}-${ARCH}.tar.gz"
 URL="https://github.com/$REPO/releases/download/$VERSION/$FILENAME"
 
 echo ""
