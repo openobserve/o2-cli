@@ -1,0 +1,45 @@
+# ============================================================================
+#                 OpenObserve Pipeline Destination - Datadog Type
+#                 Used for sending pipeline data to Datadog
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: datadog-pipeline-dest
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  # Destination configuration
+  name: datadog-pipeline-dest
+  org: "dev"
+
+  # Pipeline destination specific fields
+  type: http                        # Always http for pipeline destinations
+  destinationTypeName: datadog      # Specifies this is a Datadog pipeline destination
+
+  url: https://http-intake.logs.datadoghq.com/api/v2/logs  # Datadog logs intake endpoint
+  method: post
+
+  headers:
+    DD-API-KEY: "YOUR-DATADOG-API-KEY"     # Required: Datadog API key
+    Content-Type: "application/json"
+
+  #ddsource and ddtags are mandatory for datadog
+  metadata:                        # Datadog metadata for log enrichment (Optional but recommended)
+    ddsource: "openobserve"        # Source of the logs
+    ddtags: "env:production,service:openobserve"  # Tags for filtering in Datadog
+    hostname: "prod-server"
+    service: "openobserve-logs"
+
+  outputFormat: json                 # MUST be 'json' for Datadog
+  skipTlsVerify: false
+
+  # Notes:
+  # - This is a pipeline destination because destinationTypeName is set to 'datadog'
+  # - outputFormat MUST be 'json' for Datadog destinations
+  # - DD-API-KEY header is required
+  # - Use the appropriate Datadog intake URL for your region

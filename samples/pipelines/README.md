@@ -38,49 +38,92 @@ Real-time data processing pipeline.
 o2 pipeline create -f real-time-pipeline1.yaml
 ```
 
-## 💡 Commands
-
-### Create Pipeline
-```bash
-o2 pipeline create -f pipeline.yaml
-o2 pipeline create -f pipeline.yaml --profile prod
-```
+## 💡 Pipeline Commands
 
 ### List Pipelines
 ```bash
-o2 pipeline list
+# List all pipelines
 o2 list pipeline
-o2 pipeline list --output json
+o2 pipeline list
+
+# Different output formats
+o2 list pipeline --output json
+o2 list pipeline --output yaml
+o2 list pipeline --output wide
 ```
 
-### Get Pipeline
+### Get Pipeline Details
 ```bash
+# Get specific pipeline by name
+o2 get pipeline my-pipeline
 o2 pipeline get my-pipeline
-o2 pipeline get my-pipeline --output yaml > backup.yaml
+
+# Export to YAML (for backup)
+o2 get pipeline my-pipeline --output yaml > backup.yaml
+```
+
+### Create Pipeline
+```bash
+# Create from file
+o2 create pipeline -f pipeline.yaml
+o2 pipeline create -f pipeline.yaml
+
+# With specific profile
+o2 create pipeline -f pipeline.yaml --profile prod
 ```
 
 ### Update Pipeline
 ```bash
-# Auto-extract name
+# Update from file (auto-extracts name from file)
+o2 update pipeline -f pipeline.yaml
 o2 pipeline update -f pipeline.yaml
 
-# Explicit name
-o2 pipeline update MyPipeline -f updated.yaml
+# Update with explicit name (can differ from file)
+o2 update pipeline MyPipeline -f updated.yaml
 ```
 
 ### Delete Pipeline
 ```bash
-# By name
+# Delete by name
+o2 delete pipeline my-pipeline
 o2 pipeline delete my-pipeline
 
-# From file
-o2 pipeline delete -f pipeline.yaml
+# Delete from file (extracts name from file)
+o2 delete pipeline -f pipeline.yaml
 ```
 
-### Pause/Resume
+### Pause/Resume Pipeline
 ```bash
+# Pause a running pipeline
 o2 pipeline pause my-pipeline
+
+# Resume a paused pipeline
 o2 pipeline resume my-pipeline
+```
+
+## 🎯 Complete Workflow Example
+
+```bash
+# 1. Create a pipeline
+o2 create pipeline -f real-time-pipeline1.yaml
+
+# 2. List to verify
+o2 list pipeline
+
+# 3. Get details
+o2 get pipeline my-pipeline
+
+# 4. Pause temporarily for maintenance
+o2 pipeline pause my-pipeline
+
+# 5. Resume after maintenance
+o2 pipeline resume my-pipeline
+
+# 6. Update configuration
+o2 update pipeline -f real-time-pipeline1.yaml
+
+# 7. Delete when done
+o2 delete pipeline my-pipeline
 ```
 
 ## 📝 Pipeline Components
@@ -93,5 +136,6 @@ Pipelines consist of:
 
 ## 🔗 More Information
 
-- [Operator Pipeline Samples](../../../o2-k8s-operator/samples/pipelines/)
-- [O2 CLI Commands](../../O2_CLI_COMMANDS.md)
+- See [COMMANDS.md](../../docs/COMMANDS.md) for complete command reference
+- See [Functions](../functions/README.md) for creating VRL functions to use in pipelines
+- See [Destinations](../destinations/README.md) for pipeline destinations

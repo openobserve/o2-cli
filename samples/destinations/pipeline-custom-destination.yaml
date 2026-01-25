@@ -1,0 +1,44 @@
+# ============================================================================
+#                 OpenObserve Pipeline Destination - Custom Type
+#                 Used for sending pipeline data to custom endpoints
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: custom-pipeline-dest
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  # Destination configuration
+  name: custom-pipeline-dest
+  org: "dev"
+
+  # Pipeline destination specific fields
+  type: http                        # Always http for pipeline destinations
+  destinationTypeName: custom       # Specifies this is a custom pipeline destination
+
+  url: https://custom-api.example.com/ingest  # Full URL for custom endpoint
+  method: post
+
+  headers:
+    X-API-Key: "YOUR-CUSTOM-API-KEY"
+    Content-Type: "application/json"
+    X-Custom-Header: "custom-value"
+
+  metadata:                        # Custom metadata fields (Optional)
+    source: "openobserve"
+    environment: "production"
+    datacenter: "us-east-1"
+
+  outputFormat: json                 # Can be 'json' OR 'nestedevent' for custom
+  skipTlsVerify: false
+
+  # Notes:
+  # - This is a pipeline destination because destinationTypeName is set to 'custom'
+  # - outputFormat can be either 'json' or 'nestedevent' for custom destinations
+  # - This provides flexibility for integrating with various third-party systems
+  # - Headers can be customized based on your endpoint requirements

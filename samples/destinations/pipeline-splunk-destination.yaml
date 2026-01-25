@@ -1,0 +1,43 @@
+# ============================================================================
+#                 OpenObserve Pipeline Destination - Splunk Type
+#                 Used for sending pipeline data to Splunk
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: splunk-pipeline-dest
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  # Destination configuration
+  name: splunk-pipeline-dest
+  org: "dev"                     # Organization name
+
+  # Pipeline destination specific fields
+  type: http                        # Always http for pipeline destinations
+  destinationTypeName: splunk       # Specifies this is a Splunk pipeline destination
+
+  url: https://splunk.example.com:8088/services/collector/event  # Splunk HEC endpoint
+  method: post
+
+  headers:
+    Authorization: "Splunk YOUR-HEC-TOKEN-HERE"  # Must start with "Splunk "
+    Content-Type: "application/json"
+
+  metadata:                        # Splunk metadata fields (Optional but recommended)
+    hostname: "production-server"
+    source: "openobserve"
+    sourcetype: "openobserve_logs"
+
+  outputFormat: nestedevent          # MUST be 'nestedevent' for Splunk
+  skipTlsVerify: false
+
+  # Notes:
+  # - This is a pipeline destination because destinationTypeName is set to 'splunk'
+  # - outputFormat MUST be 'nestedevent' for Splunk destinations
+  # - Authorization header MUST start with "Splunk " followed by your HEC token
+  # - No template field for pipeline destinations

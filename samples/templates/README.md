@@ -126,36 +126,83 @@ spec:
   isBody: true
 ```
 
-## Commands
-
-### Create Template
-```bash
-o2 template create -f my-template.yaml
-o2 template create -f my-template.yaml --profile prod
-o2 template create -f my-template.yaml --org myorg
-```
+## 💡 Template Commands
 
 ### List Templates
 ```bash
-o2 template list
+# List all templates
 o2 list template
+o2 template list
+
+# Different output formats
 o2 list template --output json
+o2 list template --output yaml
+o2 list template --output wide
 ```
 
-### Get Template
+### Get Template Details
 ```bash
+# Get specific template by name
+o2 get template StandardAlert
 o2 template get StandardAlert
-o2 template get StandardAlert --output yaml > backup.yaml
+
+# Export to YAML (for backup or modification)
+o2 get template StandardAlert --output yaml > backup.yaml
+```
+
+### Create Template
+```bash
+# Create from file
+o2 create template -f template.yaml
+o2 template create -f template.yaml
+
+# With specific profile
+o2 create template -f template.yaml --profile prod
+
+# With specific organization
+o2 create template -f template.yaml --org myorg
 ```
 
 ### Update Template
 ```bash
-o2 template update StandardAlert -f updated-template.yaml
+# Update from file (auto-extracts name from file)
+o2 update template -f template.yaml
+o2 template update -f template.yaml
+
+# Update with explicit name (can differ from file)
+o2 update template StandardAlert -f updated-template.yaml
 ```
 
 ### Delete Template
 ```bash
+# Delete by name
+o2 delete template old-template
 o2 template delete old-template
+
+# Delete from file (extracts name from file)
+o2 delete template -f template.yaml
+```
+
+## 🎯 Complete Workflow Example
+
+```bash
+# 1. Create a template
+o2 create template -f simple-slack-template.yaml
+
+# 2. List to verify
+o2 list template
+
+# 3. Get details
+o2 get template slack-alerts
+
+# 4. Update template body
+o2 update template -f simple-slack-template.yaml
+
+# 5. Export for backup
+o2 get template slack-alerts --output yaml > slack-backup.yaml
+
+# 6. Delete when done
+o2 delete template slack-alerts
 ```
 
 ## Template Variables
@@ -206,7 +253,8 @@ o2 template get MyTemplate -o yaml > mytemplate.yaml
 o2 template update MyTemplate -f mytemplate.yaml
 ```
 
-## More Information
+## 🔗 More Information
 
-- [O2 CLI Documentation](../../README.md)
-- [Operator Template Samples](../../../o2-k8s-operator/samples/alerttemplates/)
+- See [COMMANDS.md](../../docs/COMMANDS.md) for complete command reference
+- See [Alerts](../alerts/README.md) for using templates with alerts
+- See [Destinations](../destinations/README.md) for alert destinations that use templates

@@ -1,0 +1,45 @@
+# ============================================================================
+#           Example: Function that FAILS Test Validation
+#           This demonstrates what happens when a function test fails
+# ============================================================================
+# Expected behavior:
+# - kubectl apply will be REJECTED
+# - You'll see detailed error message about test failure
+# - Function will NOT be created in OpenObserve
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: intentional-test-failure
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  name: "test_failure_demo"
+  org: "dev"
+
+  # This function has an intentional error to demonstrate test failure
+  function: |
+    # Try to access a field that doesn't exist in test data
+    # This will cause the test to fail
+    .result = .nonexistent_field ?? "default"
+
+    # This line will cause an error because we're trying to parse
+    # something that's not JSON
+    parsed = parse_json(.not_json_field)
+    .parsed_data = parsed
+
+    .
+
+  test:
+    enabled: true  # Test WILL FAIL and block creation
+    events:
+      # This test event doesn't have the fields the function expects
+      # So the function will error when processing it
+      - _timestamp: 1735128527652186
+        message: "Test message"
+        # Missing: not_json_field, nonexistent_field
+        # The function will fail trying to parse these missing fields

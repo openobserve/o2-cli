@@ -115,43 +115,82 @@ headers:
   Authorization: "Basic BASE64"
 ```
 
-## 💡 Commands
+## 💡 Destination Commands
 
-### Create
+### List Destinations
 ```bash
-o2 dest create -f destination.yaml
-o2 destination create -f destination.yaml --profile prod
-```
-
-### List
-```bash
-o2 dest list
-o2 dest list --type http
+# List all destinations
 o2 list destination
+o2 dest list
+
+# Filter by type
+o2 list dest --type http
+o2 list dest --type email
+o2 list dest --type sns
+
+# Different output formats
+o2 list dest --output json
+o2 list dest --output yaml
+o2 list dest --output wide
 ```
 
-### Get
+### Get Destination Details
 ```bash
+# Get specific destination by name
+o2 get dest my-destination
 o2 dest get my-destination
-o2 dest get my-destination --output yaml
+
+# Export to YAML
+o2 get dest my-destination --output yaml
 ```
 
-### Update
+### Create Destination
 ```bash
-# Auto-extract name
+# Create from file
+o2 create dest -f destination.yaml
+o2 dest create -f destination.yaml
+
+# With specific profile
+o2 create dest -f destination.yaml --profile prod
+```
+
+### Update Destination
+```bash
+# Update from file (auto-extracts name from file)
+o2 update dest -f destination.yaml
 o2 dest update -f destination.yaml
 
-# Explicit name
-o2 dest update MyDestination -f updated.yaml
+# Update with explicit name (can differ from file)
+o2 update dest MyDestination -f updated.yaml
 ```
 
-### Delete
+### Delete Destination
 ```bash
-# By name
+# Delete by name
+o2 delete dest my-destination
 o2 dest delete my-destination
 
-# From file
-o2 dest delete -f destination.yaml
+# Delete from file (extracts name from file)
+o2 delete dest -f destination.yaml
+```
+
+## 🎯 Complete Workflow Example
+
+```bash
+# 1. Create a destination
+o2 create dest -f simple-http-alert-destination.yaml
+
+# 2. List to verify
+o2 list dest
+
+# 3. Get details
+o2 get dest slack-alerts
+
+# 4. Update configuration
+o2 update dest -f simple-http-alert-destination.yaml
+
+# 5. Delete when done
+o2 delete dest slack-alerts
 ```
 
 ## 📝 Field Reference
@@ -214,5 +253,6 @@ headers:
 
 ## 🔗 More Information
 
-- [O2 CLI Commands](../../O2_CLI_COMMANDS.md)
-- [Filtering Guide](../../FILTERING_GUIDE.md)
+- See [COMMANDS.md](../../docs/COMMANDS.md) for complete command reference
+- See [Alert Templates](../templates/README.md) for creating alert templates
+- See [Alerts](../alerts/README.md) for using destinations with alerts

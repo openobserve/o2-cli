@@ -1,0 +1,115 @@
+# ============================================================================
+#           OpenObserve Advanced K8s Log Processing Function
+#           Complex function for Kubernetes log transformation
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: advanced-k8s-processor        # Kubernetes resource name
+  namespace: o2operator              # Target namespace for the function resource
+spec:
+  configRef:
+    name: openobserve-main           # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator            # Namespace of the config (Optional)
+
+  name: "k8s_log_processor"         # Function name in OpenObserve (Required)
+  org: "dev"                        # Organization name (Optional)
+
+  # Advanced VRL function for K8s log processing
+  function: |
+    # Parse JSON body for specific containers
+    if .k8s_container_name == "zinc-cp" || .k8s_container_name == "postgres" || .k8s_container_name == "openobserve" {
+        body, err = parse_json(.body)
+        if err == null {
+            .body = body
+
+            # Extract nested fields if they exist
+            if exists(.body.message) {
+                .message = .body.message
+            }
+            if exists(.body.level) {
+                .log_level = .body.level
+            }
+            if exists(.body.timestamp) {
+                .app_timestamp = .body.timestamp
+            }
+        }
+    }
+
+    # Enrich with Kubernetes metadata
+    if exists(.k8s_namespace_name) {
+        .environment = if .k8s_namespace_name == "production" {
+            "prod"
+        } else if .k8s_namespace_name == "staging" {
+            "staging"
+        } else if .k8s_namespace_name == "development" {
+            "dev"
+        } else {
+            "other"
+        }
+    }
+
+    # Add deployment info
+    if exists(.k8s_deployment_name) {
+        .deployment = .k8s_deployment_name
+        .service = split(.k8s_deployment_name, "-")[0] ?? "unknown"
+    }
+
+    # Calculate log size
+    .log_size_bytes = length(encode_json(.))
+
+    # Add alerting flags based on patterns
+    # Combine message and log fields for searching
+    search_text = downcase(string(.message) ?? string(.log) ?? "")
+    .contains_error = contains(search_text, "error") ||
+                      contains(search_text, "exception") ||
+                      contains(search_text, "failed")
+
+    .contains_warning = contains(search_text, "warn") ||
+                        contains(search_text, "warning")
+
+    # Clean up unnecessary fields
+    del(.log_file_path)
+    del(.logtag)
+    del(.k8s_pod_uid)
+    del(.stream)
+    del(.time)
+
+    # Remove empty fields
+    if .message == "" {
+        del(.message)
+    }
+
+    .
+
+  # Test configuration with sample K8s logs
+  test:
+    enabled: true  # Set to true to test before creation
+    events:
+      - _timestamp: 1735128523652186
+        k8s_namespace_name: "production"
+        k8s_container_name: "zinc-cp"
+        k8s_deployment_name: "zinc-cp-deployment"
+        k8s_pod_name: "zinc-cp-deployment-7d9f8c6b5f-xvn4k"
+        body: '{"level":"info","timestamp":"2024-12-03T10:00:00Z","message":"Database connection established","connection_pool":10}'
+        log_file_path: "/var/log/containers/zinc-cp.log"
+        logtag: "F"
+
+      - _timestamp: 1735128522644223
+        k8s_namespace_name: "staging"
+        k8s_container_name: "openobserve"
+        k8s_deployment_name: "openobserve-router"
+        k8s_pod_name: "openobserve-router-6b7d9c8f5d-abc123"
+        log: "ERROR: Failed to connect to upstream service"
+        log_file_path: "/var/log/containers/openobserve.log"
+        logtag: "F"
+
+      - _timestamp: 1735128521633112
+        k8s_namespace_name: "development"
+        k8s_container_name: "postgres"
+        k8s_deployment_name: "postgres-db"
+        k8s_pod_name: "postgres-db-5d6f7c8b9a-xyz789"
+        body: '{"level":"warning","timestamp":"2024-12-03T10:00:00Z","message":"Slow query detected","query_time_ms":5000}'
+        log_file_path: "/var/log/containers/postgres.log"
+        logtag: "F"

@@ -1,0 +1,56 @@
+# ============================================================================
+#                 OpenObserve Alert Template - HTTP Type (PagerDuty Webhook)
+#                 Used for sending alerts to PagerDuty via HTTP webhook
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveAlertTemplate
+metadata:
+  name: http-pagerduty-webhook-template  # Kubernetes resource name
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  # Alert template configuration
+  name: "pagerduty-webhook-incident"    # Unique identifier for the alert template
+  org: "prod"                           # Organization name
+
+  # Template content
+  title: "PagerDuty Alert: {alert_name}"  # Title of the alert template
+
+  # PagerDuty Events API v2 payload (HTTP type is used for all webhooks)
+  body: |
+    {
+      "routing_key": "{pagerduty_routing_key}",
+      "event_action": "trigger",
+      "dedup_key": "{alert_name}-{stream_name}-{timestamp}",
+      "payload": {
+        "summary": "{alert_description}",
+        "source": "{stream_name}",
+        "severity": "critical",
+        "timestamp": "{timestamp_iso}",
+        "component": "{service}",
+        "group": "{org_name}",
+        "class": "{alert_type}",
+        "custom_details": {
+          "alert_name": "{alert_name}",
+          "organization": "{org_name}",
+          "stream": "{stream_name}",
+          "stream_type": "{stream_type}",
+          "environment": "{env}",
+          "host": "{host}",
+          "service": "{service}",
+          "triggered_at": "{triggered_at}",
+          "threshold": "{threshold}",
+          "actual_value": "{actual_value}",
+          "message": "{message}"
+        }
+      },
+      "client": "OpenObserve Alert System",
+      "client_url": "https://openobserve.example.com"
+    }
+
+  type: "http"                  # Type must be 'http' for webhook notifications
+  isDefault: false

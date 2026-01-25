@@ -1,0 +1,42 @@
+# ============================================================================
+#                 OpenObserve Pipeline Destination - Elasticsearch Type
+#                 Used for sending pipeline data to Elasticsearch
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: elasticsearch-pipeline-dest
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  # Destination configuration
+  name: elasticsearch-pipeline-dest
+  org: "dev"
+
+  # Pipeline destination specific fields
+  type: http                           # Always http for pipeline destinations
+  destinationTypeName: elasticsearch   # Specifies this is an Elasticsearch pipeline destination
+
+  url: https://elasticsearch.example.com:9200/_bulk  # Elasticsearch bulk endpoint
+  method: post
+
+  headers:
+    Authorization: "Basic BASE64_ENCODED_CREDENTIALS"
+    Content-Type: "application/x-ndjson"
+
+  # Elasticsearch bulk format configuration
+  outputFormat:                       # Output format for Elasticsearch bulk API (Required)
+    esbulk:
+      index: "openobserve-logs"       # Target index name in Elasticsearch
+
+  skipTlsVerify: false
+
+  # Notes:
+  # - This is a pipeline destination because destinationTypeName is set to 'elasticsearch'
+  # - outputFormat MUST be 'esbulk' for Elasticsearch destinations
+  # - The URL should point to the _bulk endpoint
+  # - Content-Type should be 'application/x-ndjson' for bulk operations

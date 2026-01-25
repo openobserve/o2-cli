@@ -1,0 +1,39 @@
+# ============================================================================
+#                 OpenObserve Destination - Pipeline OpenObserve Type
+#                 Used for forwarding logs/metrics to another OpenObserve instance
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: openobserve-pipeline-dest  # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator             # Target namespace for the destination resource
+spec:
+  configRef:
+    name: openobserve-main          # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator           # Namespace of the config (Optional, defaults to same namespace)
+
+  # Destination configuration
+  name: openobserve-pipeline-dest  # Unique identifier for the destination (Required)
+  org: "dev"                    # Organization name (Optional, defaults to org from ConfigRef)
+
+  # Pipeline destination specific fields
+  type: http                        # Destination type (Required: http for pipeline destinations)
+  destinationTypeName: openobserve  # Makes this a pipeline destination (Required for pipeline)
+
+  # OpenObserve specific configuration
+  url: https://api.openobserve.ai/api/default/default/_json  # OpenObserve ingestion endpoint (Required)
+  method: post                                               # HTTP method (Optional, defaults to post)
+
+  headers:                                                   # HTTP headers for authentication (Required)
+    Authorization: "Basic YOUR_BASE64_ENCODED_TOKEN"        # Base64 encoded username:password
+
+  outputFormat: json                # Output format for OpenObserve (Required: json)
+  skipTlsVerify: false              # Whether to skip TLS certificate verification (Optional, defaults to false)
+
+  # Notes:
+  # - This is a pipeline destination (no template field for pipelines)
+  # - destinationTypeName: openobserve makes this a pipeline destination
+  # - Authorization header must be "Basic " followed by base64(username:password)
+  # - URL format: https://<instance>/api/<org>/<stream>/_json
+  # - Replace YOUR_BASE64_ENCODED_TOKEN with actual credentials

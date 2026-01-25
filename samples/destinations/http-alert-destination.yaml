@@ -1,0 +1,39 @@
+# ============================================================================
+#                 OpenObserve Destination - HTTP Alert Type
+#                 Used for sending alerts via webhook/HTTP endpoint
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: webhook-alert-dest       # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator          # Target namespace for the destination resource
+spec:
+  configRef:
+    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
+
+  # Destination configuration
+  name: "webhook-alert-dest"       # Unique identifier for the destination (Required)
+  org: "dev"                 # Organization name (Optional, defaults to org from ConfigRef)
+
+  # HTTP destination specific fields
+  type: "http"                     # Destination type (Required: http for webhook destinations)
+  # destinationTypeName is null/empty, so this is an alert destination
+
+  url: "https://webhook.example.com/alerts"  # Webhook endpoint URL (Required for http type)
+  method: "post"                              # HTTP method (Optional: post, put, get; defaults to post)
+
+  headers:                                  # HTTP headers to include in the request (Optional)
+    Authorization: "Bearer TOKEN"
+    Content-Type: "application/json"
+
+  outputFormat: "json"                        # Output format (Optional: json, nestedevent)
+  skipTlsVerify: false                      # Whether to skip TLS certificate verification (Optional, defaults to false)
+  template: "http-critical-alert"            # Reference to an existing alert template for formatting (Required for alert destinations)
+
+  # Notes:
+  # - This is an alert destination because destinationTypeName is not set
+  # - Template must exist in the same organization
+  # - Headers can include authentication tokens and content type
+  # - Set skipTlsVerify to true only for development/testing with self-signed certificates

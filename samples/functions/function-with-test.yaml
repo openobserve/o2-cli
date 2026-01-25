@@ -1,0 +1,53 @@
+# ============================================================================
+#              OpenObserve Function with Test Configuration
+#              Function that tests transformation before applying
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: function-with-test           # Kubernetes resource name
+  namespace: o2operator              # Target namespace for the function resource
+spec:
+  configRef:
+    name: openobserve-main           # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator            # Namespace of the config (Optional)
+
+  name: "tested_function"            # Function name in OpenObserve (Required)
+  org: "dev"                        # Organization name (Optional)
+
+  # VRL function to add custom field
+  function: |
+    # Add custom metadata
+    .mdmosaraf = "mdmosaraf"
+
+    # Add processing info
+    .processed_by = "k8s-operator"
+    .function_version = "1.0.0"
+
+    # Enrich based on log level
+    if exists(.level) {
+        .alert_required = .level == "error" || .level == "critical"
+    }
+
+    .
+
+  # Test configuration to validate function before creation/update
+  test:
+    enabled: true                    # Enable testing before applying
+    events:                          # Test events for validation
+      - _timestamp: 1735128523652186
+        job: "test"
+        level: "info"
+        log: "test message for openobserve"
+
+      - _timestamp: 1735128522644223
+        job: "test"
+        level: "error"
+        log: "error message for testing"
+
+      - _timestamp: 1735128521633112
+        job: "production"
+        level: "critical"
+        log: "critical alert test"
+        message: '{"user":"admin","action":"login","status":"success"}'

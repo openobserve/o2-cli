@@ -20,29 +20,60 @@ Comprehensive dashboard with multiple panel types.
 o2 create dashboard -f dashboard4.yaml
 ```
 
-## 💡 Dashboard Operations
+## 💡 Dashboard Commands
 
-**All operations work with full K8s YAML format:**
-
+### List Dashboards
 ```bash
-# Create
+# List all dashboards in default folder
+o2 list dashboard
+o2 dashboard list
+
+# List dashboards in specific folder
+o2 list dashboard --folder production
+o2 list dashboard --folder o2cli
+
+# Different output formats
+o2 list dashboard --output json
+o2 list dashboard --output yaml
+o2 list dashboard --output wide
+```
+
+### Get Dashboard Details
+```bash
+# Get specific dashboard by ID
+o2 get dashboard 7417863561566760960
+o2 dashboard get 7417863561566760960
+
+# Export to YAML
+o2 get dashboard 7417863561566760960 --output yaml
+```
+
+### Create Dashboard
+```bash
+# Create from file (folder read from spec.folderName in YAML)
 o2 create dashboard -f dashboard.yaml
 o2 dashboard create -f dashboard.yaml
 
-# List
-o2 list dashboard
-o2 list dashboard --folder production
+# The folder specified in spec.folderName will be auto-created if it doesn't exist
+```
 
-# Get (requires ID from list)
-o2 get dashboard 7417863561566760960
-o2 dashboard get 7417863561566760960 --output yaml
-
-# Update (requires ID)
+### Update Dashboard
+```bash
+# Update dashboard (requires ID + file)
 o2 update dashboard 7417863561566760960 -f updated.yaml
+o2 dashboard update 7417863561566760960 -f updated.yaml
 
-# Delete (requires ID from list)
+# Folder is read from spec.folderName in the YAML file
+```
+
+### Delete Dashboard
+```bash
+# Delete by ID (uses default folder)
 o2 delete dashboard 7417863561566760960
-o2 dashboard delete 7417863561566760960 --folder production
+o2 dashboard delete 7417863561566760960
+
+# Delete with specific folder
+o2 delete dashboard 7417863561566760960 --folder production
 ```
 
 ## 📝 Important Notes
@@ -50,22 +81,55 @@ o2 dashboard delete 7417863561566760960 --folder production
 ### Dashboard IDs
 - Dashboards use **numeric IDs** (e.g., `7417863561566760960`)
 - Get the ID from `o2 list dashboard` command
-- **Delete requires ID** (not file or title)
+- Update and delete operations require the **dashboard ID**
+- Get and list operations can filter by folder
 
-### Workflow
-```bash
-# 1. List to get ID
-o2 list dashboard --folder production
-# Shows: 7417863561566760960   My Dashboard
-
-# 2. Delete using that ID
-o2 delete dashboard 7417863561566760960
-```
+### Folders
+- Folder is specified in YAML: `spec.folderName: "production"`
+- If folder doesn't exist, it will be **auto-created** during dashboard creation
+- Default folder is `"default"` if not specified
+- CLI shows: "Folder not present, creating new folder" when creating folders
 
 ### YAML Format
 Dashboards use **full Kubernetes format** (includes apiVersion, kind, metadata, spec).
 
-The CLI auto-detects and handles the format correctly.
+Example structure:
+```yaml
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDashboard
+metadata:
+  name: my-dashboard
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-config
+    namespace: o2operator
+  title: "My Dashboard"
+  org: "default"
+  folderName: "production"  # Auto-created if doesn't exist
+  dashboard:
+    # Dashboard definition here
+```
+
+### Workflow
+```bash
+# 1. Create dashboard (folder auto-created)
+o2 create dashboard -f dashboard.yaml
+# Output shows: "Folder not present, creating new folder" (if needed)
+
+# 2. List to get ID
+o2 list dashboard --folder production
+# Shows: 7417863561566760960   My Dashboard
+
+# 3. Get details
+o2 get dashboard 7417863561566760960
+
+# 4. Update (folder read from YAML)
+o2 update dashboard 7417863561566760960 -f updated.yaml
+
+# 5. Delete using ID
+o2 delete dashboard 7417863561566760960 --folder production
+```
 
 ## 🔗 More Information
 

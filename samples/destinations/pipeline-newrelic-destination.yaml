@@ -1,0 +1,41 @@
+# ============================================================================
+#                 OpenObserve Destination - Pipeline New Relic Type
+#                 Used for forwarding logs/metrics to New Relic
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: newrelic-pipeline-dest    # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator           # Target namespace for the destination resource
+spec:
+  configRef:
+    name: openobserve-main        # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator         # Namespace of the config (Optional, defaults to same namespace)
+
+  # Destination configuration
+  name: newrelic-pipeline-dest   # Unique identifier for the destination (Required)
+  org: "dev"                  # Organization name (Optional, defaults to org from ConfigRef)
+
+  # Pipeline destination specific fields
+  type: http                      # Destination type (Required: http for pipeline destinations)
+  destinationTypeName: newrelic   # Makes this a pipeline destination for New Relic (Required)
+
+  # New Relic Log API configuration
+  url: https://log-api.newrelic.com/log/v1  # New Relic log API endpoint (Required)
+  method: post                               # HTTP method (Optional, defaults to post)
+
+  headers:                                   # HTTP headers for authentication (Required)
+    Api-Key: "YOUR_NEW_RELIC_LICENSE_KEY"   # New Relic License Key (Required)
+    Content-Type: "application/json"
+
+  outputFormat: json               # Output format for New Relic (Required: json)
+  skipTlsVerify: false             # Whether to skip TLS certificate verification (Optional, defaults to false)
+
+  # Notes:
+  # - This is a pipeline destination (no template field for pipelines)
+  # - destinationTypeName: newrelic makes this a New Relic pipeline destination
+  # - Api-Key header contains your New Relic License Key (not an API key)
+  # - For EU datacenter, use: https://log-api.eu.newrelic.com/log/v1
+  # - The License Key can be found in New Relic One UI under API keys
+  # - Replace YOUR_NEW_RELIC_LICENSE_KEY with your actual license key

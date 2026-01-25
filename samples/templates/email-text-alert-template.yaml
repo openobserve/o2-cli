@@ -1,0 +1,112 @@
+# ============================================================================
+#                 OpenObserve Alert Template - Email Type
+#                 Used for email notifications
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveAlertTemplate
+metadata:
+  name: email-alert-template     # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator          # Target namespace for the alert template resource
+spec:
+  configRef:
+    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
+
+  # Alert template configuration
+  name: "email-notification"    # Unique identifier for the alert template (Required)
+  org: "dev"              # Organization name (Optional, defaults to org from ConfigRef)
+
+  # Template content
+  title: "[{severity}] Alert: {alert_name} - {org_name}"   # Email subject (Required)
+
+  # HTML email body template
+  body: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        body { font-family: Arial, sans-serif; }
+        .alert-container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .alert-header { background-color: #f44336; color: white; padding: 15px; border-radius: 5px 5px 0 0; }
+        .alert-header.warning { background-color: #ff9800; }
+        .alert-header.info { background-color: #2196F3; }
+        .alert-body { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
+        .alert-details { margin: 15px 0; }
+        .alert-details table { width: 100%; border-collapse: collapse; }
+        .alert-details td { padding: 8px; border-bottom: 1px solid #ddd; }
+        .alert-details td:first-child { font-weight: bold; width: 30%; }
+        .alert-actions { margin-top: 20px; text-align: center; }
+        .btn { display: inline-block; padding: 10px 20px; margin: 0 5px; text-decoration: none; color: white; border-radius: 5px; }
+        .btn-primary { background-color: #4CAF50; }
+        .btn-secondary { background-color: #008CBA; }
+      </style>
+    </head>
+    <body>
+      <div class="alert-container">
+        <div class="alert-header {severity}">
+          <h2>Alert: {alert_name}</h2>
+        </div>
+        <div class="alert-body">
+          <p><strong>Description:</strong> {alert_description}</p>
+
+          <div class="alert-details">
+            <h3>Alert Details</h3>
+            <table>
+              <tr>
+                <td>Organization:</td>
+                <td>{org_name}</td>
+              </tr>
+              <tr>
+                <td>Stream:</td>
+                <td>{stream_name} ({stream_type})</td>
+              </tr>
+              <tr>
+                <td>Severity:</td>
+                <td>{severity}</td>
+              </tr>
+              <tr>
+                <td>Triggered At:</td>
+                <td>{triggered_at}</td>
+              </tr>
+              <tr>
+                <td>Condition:</td>
+                <td>{actual_value} {operator} {threshold}</td>
+              </tr>
+              <tr>
+                <td>Environment:</td>
+                <td>{env}</td>
+              </tr>
+              <tr>
+                <td>Host:</td>
+                <td>{host}</td>
+              </tr>
+              <tr>
+                <td>Service:</td>
+                <td>{service}</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="alert-message">
+            <h3>Additional Information</h3>
+            <p>{message}</p>
+          </div>
+
+          <div class="alert-actions">
+            <a href="https://openobserve.example.com/dashboard/{dashboard_id}" class="btn btn-primary">View Dashboard</a>
+            <a href="https://wiki.example.com/runbooks/{alert_name}" class="btn btn-secondary">View Runbook</a>
+          </div>
+
+          <hr style="margin-top: 30px;">
+          <p style="font-size: 12px; color: #666; text-align: center;">
+            This is an automated alert from OpenObserve monitoring system.<br>
+            For support, contact: support@example.com
+          </p>
+        </div>
+      </div>
+    </body>
+    </html>
+
+  type: "email"                  # Type of alert template (Required: http, slack, email, pagerduty, webhook)
+  isDefault: false              # Whether this is the default template for this type

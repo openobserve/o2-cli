@@ -1,0 +1,42 @@
+# ============================================================================
+#                 OpenObserve Destination - Pipeline Dynatrace Type
+#                 Used for forwarding logs/metrics to Dynatrace
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: dynatrace-pipeline-dest   # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator           # Target namespace for the destination resource
+spec:
+  configRef:
+    name: openobserve-main        # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator         # Namespace of the config (Optional, defaults to same namespace)
+
+  # Destination configuration
+  name: dynatrace-pipeline-dest  # Unique identifier for the destination (Required)
+  org: "dev"                  # Organization name (Optional, defaults to org from ConfigRef)
+
+  # Pipeline destination specific fields
+  type: http                      # Destination type (Required: http for pipeline destinations)
+  destinationTypeName: dynatrace  # Makes this a pipeline destination for Dynatrace (Required)
+
+  # Dynatrace Log Ingest API configuration
+  url: https://YOUR_ENVIRONMENT.live.dynatrace.com/api/v2/logs/ingest  # Dynatrace log ingest endpoint (Required)
+  method: post                                                          # HTTP method (Optional, defaults to post)
+
+  headers:                                                             # HTTP headers for authentication (Required)
+    Authorization: "Api-Token YOUR_DYNATRACE_API_TOKEN"                # Dynatrace API token
+    Content-Type: "application/json; charset=utf-8"
+
+  outputFormat: json               # Output format for Dynatrace (Required: json)
+  skipTlsVerify: false             # Whether to skip TLS certificate verification (Optional, defaults to false)
+
+  # Notes:
+  # - This is a pipeline destination (no template field for pipelines)
+  # - destinationTypeName: dynatrace makes this a Dynatrace pipeline destination
+  # - Authorization header must start with "Api-Token " followed by your token
+  # - URL format: https://<your-environment-id>.live.dynatrace.com/api/v2/logs/ingest
+  # - Token needs "ingest logs" permission in Dynatrace
+  # - Replace YOUR_ENVIRONMENT with your Dynatrace environment ID
+  # - Replace YOUR_DYNATRACE_API_TOKEN with your actual API token

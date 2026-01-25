@@ -1,0 +1,135 @@
+# ============================================================================
+#                  OpenObserve Real-Time Pipeline Test Template 
+#                   Connect Source -> Transform -> Destination
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObservePipeline
+metadata:
+  name: real-time-pipeline2  # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator           # Target namespace for the pipeline resource
+spec:
+  configRef:
+    name: openobserve-main         # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator      # Namespace of the config (Optional, defaults to pipeline namespace)
+
+  # ============================================================================
+  # PIPELINE IDENTIFICATION & BASIC SETTINGS
+  # ============================================================================
+
+  # Pipeline name in OpenObserve (Required)
+  # - Must be unique within the organization
+  # - This is the internal name in OpenObserve, different from K8s resource name
+  # - Pattern: alphanumeric with underscores/hyphens
+  # - Example: "log_enrichment_pipeline", "metrics_aggregation"
+  name: "real-time-pipeline2"
+
+  # Pipeline description (Optional but recommended)
+  # - Human-readable description of pipeline purpose
+  # - Max length: 500 characters
+  # - Should explain: what data it processes, transformations applied, output
+  description: "Test Pipeline"
+
+  # Enable/disable the pipeline (Optional, defaults to true)
+  # - When false, pipeline won't process data but remains configured
+  # - Useful for temporarily disabling pipelines during maintenance
+  enabled: true
+
+  # Organization name (Optional)
+  # - Usually auto-determined from configRef
+  # - Override only if targeting different org
+  org: "default"
+
+  # ============================================================================
+  # DATA SOURCE CONFIGURATION (Required)
+  # Defines the input stream for the pipeline
+  # ============================================================================
+  source:
+    # Stream name to read from (Required)
+    # - Must exist in OpenObserve
+    # - Examples: "application_logs", "kubernetes_events", "nginx_access"
+    streamName: "testlogs"
+
+    # Stream type (Optional, defaults to "logs")
+    # - Allowed values: logs, metrics, traces
+    # - Determines available processing functions
+    streamType: "logs"
+
+    # Source type (Optional, defaults to "realtime")
+    # - "realtime": Processes data as it arrives
+    # - "scheduled": Batch processing at intervals
+    sourceType: "realtime"
+
+  # ============================================================================
+  # PIPELINE NODES (Required)
+  # Define processing steps - minimum 1 node required
+  # ============================================================================
+  nodes:
+    # ==================================
+    # NODE TYPE 1: CONDITION NODE
+    # Filters data based on conditions
+    # ==================================
+    - id: "node1"       # Unique identifier within pipeline (Required)
+      type: "condition"         # Node type (Required)
+      name: "Filter Error Logs" # Human-readable name (Required)
+
+      # Configuration for this node type
+      config:
+        # Conditions can be simple or complex with AND/OR logic
+        conditions:
+          and:  # or use "or" for OR logic
+            - column: "level"
+              operator: "="
+              value: "ERROR"
+              ignore_case: false
+            - column: "status_code"
+              operator: ">="
+              value: "500"
+              ignore_case: false
+
+        # Alternative: Simple array format (implicitly AND)
+        # conditions:
+        #   - column: "severity"
+        #     operator: ">"
+        #     value: "5"
+
+    # ==================================
+    # NODE TYPE 2: FUNCTION NODE
+    # Transforms data using VRL functions
+    # ==================================
+    - id: "node2"
+      type: "function"
+      name: "Enrich with Metadata"
+
+      config:
+        # VRL (Vector Remap Language) function
+        function: processfalse   # This is a function that will be executed on the data, Function should be available in OpenObserve
+        # Function execution settings
+        after_flatten: false  # Execute after flattening nested fields
+        num_args: 0          # Number of arguments (usually 0)
+
+    # ==================================
+    # NODE TYPE 3: STREAM OUTPUT NODE
+    # Routes data to another stream
+    # ==================================
+    - id: "output1"
+      type: "stream"
+      name: "Route to Error Stream"
+
+      config:
+        org_id: "default"           # Target organization
+        stream_name: "error_logs"   # Target stream name
+        stream_type: "logs"         # Target stream type
+
+  # ============================================================================
+  # PIPELINE EDGES (Optional but usually required)
+  # Define connections between nodes to create data flow
+  # ============================================================================
+  edges:
+    # Edge from first node to second node
+    - source: "node1"   # Source node ID (Required)
+      target: "node2"     # Target node ID (Required)
+
+    # Edge from second to third node
+    - source: "node2"
+      target: "output1"

@@ -1,0 +1,178 @@
+# ============================================================================
+#           OpenObserve Function with JSON String Test Events
+#           Shows how to use JSON strings with runtime.RawExtension
+# ============================================================================
+# You can pass test events as JSON strings by wrapping them in quotes
+# The operator will automatically parse these JSON strings
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: json-events-example
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  name: "json_events_function"
+  org: "dev"
+
+  # Function that processes different log types
+  function: |
+    # Parse log level from message
+    .level = if contains(string!(.message), "ERROR") {
+      "error"
+    } else if contains(string!(.message), "WARN") {
+      "warning"
+    } else {
+      "info"
+    }
+
+    # Add timestamp
+    .processed_at = now()
+
+    # Parse JSON body if present
+    if exists(.json_body) {
+      # Use error handling for parse_json
+      parsed, err = parse_json(.json_body)
+      if err == null {
+        .parsed_data = parsed
+      }
+    }
+
+    .
+
+  test:
+    enabled: true  # Set to true to require test validation before creation
+    events:
+      # Method 1: Inline JSON object (parsed directly)
+      - {"_timestamp": 1735128524652186, "message": "ERROR: Database connection failed", "host": "db-01", "port": 5432}
+
+      # Method 2: Multi-line JSON for complex events
+      - {
+          "_timestamp": 1735128525652186,
+          "message": "WARN: High memory usage",
+          "metrics": {
+            "memory_used": 85.5,
+            "memory_total": 100,
+            "cpu_usage": 45.2
+          },
+          "host": "server-01"
+        }
+
+---
+# ============================================================================
+#           Alternative: Pure JSON String Format
+#           For programmatically generated test data
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: generated-json-test
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  name: "generated_test_function"
+  org: "dev"
+
+  function: |
+    # Simple transformation
+    .environment = "production"
+    .processed = true
+
+    # Check for errors
+    if contains(string!(.message), "error") {
+      .alert = true
+      .severity = "high"
+    }
+
+    .
+
+  test:
+    enabled: true  # Set to true to require test validation before creation
+    events:
+      # These look like JSON objects in YAML
+      # Kubernetes automatically converts them to JSON
+      - {"_timestamp":1735128527652186,"message":"Service started","app":"web"}
+      - {"_timestamp":1735128528652186,"message":"Processing request","request_id":"abc123","duration":150}
+      - {"_timestamp":1735128529652186,"message":"error: timeout occurred","duration_ms":5000}
+
+---
+# ============================================================================
+#           Complex Example: Nested JSON with Arrays
+#           Shows handling of complex JSON structures
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveFunction
+metadata:
+  name: complex-json-test
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-main
+    namespace: o2operator
+
+  name: "complex_json_function"
+  org: "dev"
+
+  function: |
+    # Process array data safely
+    if exists(.items) {
+      # Use ! to make it infallible since we've already checked existence
+      .item_count = length!(.items)
+      # Safe array access
+      .first_item = get!(.items, [0])
+    }
+
+    # Process nested objects safely
+    if exists(.metadata.labels) {
+      # Use get() with a default value instead of ?? for nested paths
+      .env = get(.metadata.labels, ["environment"]) ?? "unknown"
+      .app = get(.metadata.labels, ["app"]) ?? "unknown"
+    }
+
+  test:
+    enabled: true  # Set to true when you want to test before creation
+    events:
+      # Complex nested JSON structure
+      - _timestamp: 1735128530652186
+        message: "Processing batch"
+        items:
+          - id: "item1"
+            status: "processed"
+            value: 100
+          - id: "item2"
+            status: "pending"
+            value: 200
+          - id: "item3"
+            status: "failed"
+            value: 0
+        metadata:
+          labels:
+            environment: "production"
+            app: "batch-processor"
+            version: "v1.2.3"
+          annotations:
+            owner: "team-a"
+            criticality: "high"
+
+      # Another way to write the same structure inline
+      - {
+          "_timestamp": 1735128531652186,
+          "message": "Batch completed",
+          "items": [
+            {"id": "item4", "status": "processed", "value": 300},
+            {"id": "item5", "status": "processed", "value": 400}
+          ],
+          "metadata": {
+            "labels": {"environment": "staging", "app": "batch-processor"},
+            "annotations": {"owner": "team-b"}
+          }
+        }

@@ -1,0 +1,32 @@
+# ============================================================================
+#                 OpenObserve Destination - Email Alert Type
+#                 Used for sending alerts via email
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDestination
+metadata:
+  name: email-alert-dest         # Kubernetes resource name (lowercase, alphanumeric, hyphens)
+  namespace: o2operator          # Target namespace for the destination resource
+spec:
+  configRef:
+    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
+
+  # Destination configuration
+  name: email-alert-dest         # Unique identifier for the destination (Required)
+  org: "dev"                 # Organization name (Optional, defaults to org from ConfigRef)
+
+  # Email destination specific fields
+  type: email                    # Destination type (Required: email for alert destinations)
+  emails:                        # List of email recipients (Required for email type)
+  - admin@example.com
+  - alerts@example.com
+
+  method: post                   # HTTP method (Optional, defaults to post)
+  template: email-notification # Reference to an existing alert template (Required for alert destinations)
+
+  # Notes:
+  # - For email type, this is always an alert destination
+  # - Requires SMTP to be configured in OpenObserve
+  # - Template must exist in the same organization
