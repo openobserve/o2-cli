@@ -1,0 +1,134 @@
+# ============================================================================
+#          OpenObserve Dashboard - Dashboard with variables
+# ============================================================================
+#
+# IMPORTANT NOTES:
+# - Dashboard title must be unique within the organization and folder
+# - If a dashboard with the same title exists, creation will fail
+# - Before updating, the dashboard must exist in the specified org/folder
+# - The operator will check for existing dashboards before creating
+# - Org and folder default to "default" if not specified
+#
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDashboard
+metadata:
+  name: k8s-monitoring-dashboard   # Kubernetes resource name
+  namespace: o2operator              # Target namespace
+spec:
+  configRef:
+    name: openobserve-main           # OpenObserveConfig reference (Required)
+    namespace: o2operator
+
+  # Dashboard identification
+  title: "DashboardWithVariables"   # Must be unique within org/folder (Required)
+  description: "Dashboard with variables"
+
+  # Organization and folder configuration
+  org: "default"                     # Organization (defaults to "default")
+  folderName: "default"           # Folder name (defaults to "default", auto-created if missing)
+
+  # Complete dashboard definition
+  dashboard:
+    version: 8
+
+    # Dashboard variables (optional)
+    variables:
+      list:
+        - type: query_values
+          name: var1
+          label: ""
+          query_data:
+            stream_type: logs
+            stream: testdata
+            field: c_country
+            max_record_size: 50
+            filter:
+              - name: cs_method
+                operator: "="
+                value: POST
+          value: ""
+          options:
+            - label: ""
+              value: ""
+              selected: true
+          multiSelect: true
+          hideOnDashboard: false
+          selectAllValueForMultiSelect: all
+          customMultiSelectValue: []
+          escapeSingleQuotes: false
+        - type: constant
+          name: var2
+          label: var2
+          query_data: null
+          value: test
+          options:
+            - label: ""
+              value: ""
+              selected: true
+          multiSelect: false
+          hideOnDashboard: false
+          selectAllValueForMultiSelect: ""
+          customMultiSelectValue: []
+          escapeSingleQuotes: false
+        - type: textbox
+          name: var3
+          label: var3
+          query_data: null
+          value: var3
+          options:
+            - label: ""
+              value: ""
+              selected: true
+          multiSelect: false
+          hideOnDashboard: false
+          selectAllValueForMultiSelect: ""
+          customMultiSelectValue: []
+          escapeSingleQuotes: false
+        - type: custom
+          name: var4
+          label: var4
+          query_data: null
+          value: ""
+          options:
+            - label: var4_1
+              value: var4_1
+              selected: true
+            - label: var4_2
+              value: var4_1
+              selected: false
+          multiSelect: false
+          hideOnDashboard: false
+          selectAllValueForMultiSelect: first
+          customMultiSelectValue: []
+          escapeSingleQuotes: false
+      showDynamicFilters: true
+
+    # Default time range
+    defaultDatetimeDuration:
+      type: "relative"
+      relativeTimePeriod: "12d"
+
+    # Dashboard tabs
+    tabs:
+      # ======================================
+      # Tab 1: Overview
+      # ======================================
+      - tabId: "tab-001"
+        name: "Overview"
+        panels: []
+
+      # ======================================
+      # Tab 2: Tab2
+      # ======================================
+      - tabId: "tab-002"
+        name: "Tab2"
+        panels: []
+
+      # ======================================
+      # Tab 3: Tab3
+      # ======================================
+      - tabId: "tab-003"
+        name: "Tab3"
+        panels: []

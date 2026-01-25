@@ -1,0 +1,529 @@
+# ============================================================================
+#          OpenObserve Dashboard - Create Tabs with Mulitple Panels
+# ============================================================================
+#
+# IMPORTANT NOTES:
+# - Dashboard title must be unique within the organization and folder
+# - If a dashboard with the same title exists, creation will fail
+# - Before updating, the dashboard must exist in the specified org/folder
+# - The operator will check for existing dashboards before creating
+# - Org and folder default to "default" if not specified
+#
+# ============================================================================
+
+apiVersion: openobserve.ai/v1alpha1
+kind: OpenObserveDashboard
+metadata:
+  name: k8s-monitoring-dashboard   # Kubernetes resource name
+  namespace: o2operator              # Target namespace
+spec:
+  configRef:
+    name: openobserve-main           # OpenObserveConfig reference (Required)
+    namespace: o2operator
+
+  # Dashboard identification
+  title: "Dashboard3"   # Must be unique within org/folder (Required)
+  description: "Dashboard with Tabs with Mulitple Panles"
+
+  # Organization and folder configuration
+  org: "default"                     # Organization (defaults to "default")
+  folderName: "default"           # Folder name (defaults to "default", auto-created if missing)
+
+  # Complete dashboard definition
+  dashboard:
+    version: 8
+
+    # Dashboard variables (optional)
+    variables:
+      list: []
+      showDynamicFilters: true
+
+    # Default time range
+    defaultDatetimeDuration:
+      type: "relative"
+      relativeTimePeriod: "15m"
+
+    # Dashboard tabs
+    tabs:
+      # ======================================
+      # Tab 1: Overview
+      # ======================================
+      - tabId: "tab-001"
+        name: "Overview"
+        panels: 
+          - id: "panel-001"
+            title: "Panel1"
+            type: "area"
+            description: "System performance metrics over time"
+            config:
+              show_legends: true
+              decimals: 2
+              line_thickness: 1.5
+              show_gridlines: true
+              line_interpolation: "smooth"
+              show_symbol: false
+              connect_nulls: false
+              aggregation: "last"
+            queryType: "sql"
+            queries:
+              - query: SELECT histogram(_timestamp) as "x_axis_1", count(*) as "y_axis_1" FROM "testdata" GROUP BY x_axis_1 ORDER BY x_axis_1 ASC
+                vrlFunctionQuery: ""
+                customQuery: false
+                fields:
+                  stream: "default"
+                  stream_type: "logs"
+                  "x":
+                    - label: "Timestamp"
+                      alias: "x_axis_1"
+                      type: "build"
+                      color: null
+                      functionName: "histogram"
+                      sortBy: "ASC"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "_timestamp"
+                            streamAlias: null
+                        - type: "histogramInterval"
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "y":
+                    - label: "Count"
+                      alias: "y_axis_1"
+                      type: "build"
+                      color: "#5960b2"
+                      functionName: "count"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "*"
+                            streamAlias: null
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "z": []
+                  breakdown: []
+                  filter:
+                    filterType: "group"
+                    logicalOperator: "AND"
+                    conditions: []
+                config:
+                  promql_legend: ""
+                  layer_type: "scatter"
+                  weight_fixed: 1
+                  limit: 0
+                  min: 0
+                  max: 100
+                  time_shift: []
+                joins: []
+            layout:
+              x: 0
+              y: 0
+              w: 96
+              h: 18
+              i: 1
+            htmlContent: ""
+            markdownContent: ""
+            customChartContent: ""
+          - id: "panel-002"
+            title: "Panel2"
+            type: "bar"
+            description: "System performance metrics over time"
+            config:
+              show_legends: true
+              decimals: 2
+              line_thickness: 1.5
+              show_gridlines: true
+              line_interpolation: "smooth"
+              show_symbol: false
+              connect_nulls: false
+              aggregation: "last"
+            queryType: "sql"
+            queries:
+              - query: SELECT histogram(_timestamp) as "x_axis_1", count(*) as "y_axis_1" FROM "testdata" GROUP BY x_axis_1 ORDER BY x_axis_1 ASC
+                vrlFunctionQuery: ""
+                customQuery: false
+                fields:
+                  stream: "default"
+                  stream_type: "logs"
+                  "x":
+                    - label: "Timestamp"
+                      alias: "x_axis_1"
+                      type: "build"
+                      color: null
+                      functionName: "histogram"
+                      sortBy: "ASC"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "_timestamp"
+                            streamAlias: null
+                        - type: "histogramInterval"
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "y":
+                    - label: "Count"
+                      alias: "y_axis_1"
+                      type: "build"
+                      color: "#5960b2"
+                      functionName: "count"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "*"
+                            streamAlias: null
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "z": []
+                  breakdown: []
+                  filter:
+                    filterType: "group"
+                    logicalOperator: "AND"
+                    conditions: []
+                config:
+                  promql_legend: ""
+                  layer_type: "scatter"
+                  weight_fixed: 1
+                  limit: 0
+                  min: 0
+                  max: 100
+                  time_shift: []
+                joins: []
+            layout:
+              x: 96
+              y: 0
+              w: 96
+              h: 18
+              i: 2
+            htmlContent: ""
+            markdownContent: ""
+            customChartContent: ""
+
+      # ======================================
+      # Tab 2: Tab2
+      # ======================================
+      - tabId: "tab-002"
+        name: "Tab2"
+        panels: 
+          - id: "panel-001"
+            title: "Panel1"
+            type: "area"
+            description: "System performance metrics over time"
+            config:
+              show_legends: true
+              decimals: 2
+              line_thickness: 1.5
+              show_gridlines: true
+              line_interpolation: "smooth"
+              show_symbol: false
+              connect_nulls: false
+              aggregation: "last"
+            queryType: "sql"
+            queries:
+              - query: SELECT histogram(_timestamp) as "x_axis_1", count(*) as "y_axis_1" FROM "testdata" GROUP BY x_axis_1 ORDER BY x_axis_1 ASC
+                vrlFunctionQuery: ""
+                customQuery: false
+                fields:
+                  stream: "default"
+                  stream_type: "logs"
+                  "x":
+                    - label: "Timestamp"
+                      alias: "x_axis_1"
+                      type: "build"
+                      color: null
+                      functionName: "histogram"
+                      sortBy: "ASC"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "_timestamp"
+                            streamAlias: null
+                        - type: "histogramInterval"
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "y":
+                    - label: "Count"
+                      alias: "y_axis_1"
+                      type: "build"
+                      color: "#5960b2"
+                      functionName: "count"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "*"
+                            streamAlias: null
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "z": []
+                  breakdown: []
+                  filter:
+                    filterType: "group"
+                    logicalOperator: "AND"
+                    conditions: []
+                config:
+                  promql_legend: ""
+                  layer_type: "scatter"
+                  weight_fixed: 1
+                  limit: 0
+                  min: 0
+                  max: 100
+                  time_shift: []
+                joins: []
+            layout:
+              x: 0
+              y: 0
+              w: 96
+              h: 18
+              i: 1
+            htmlContent: ""
+            markdownContent: ""
+            customChartContent: ""
+          - id: "panel-002"
+            title: "Panel2"
+            type: "bar"
+            description: "System performance metrics over time"
+            config:
+              show_legends: true
+              decimals: 2
+              line_thickness: 1.5
+              show_gridlines: true
+              line_interpolation: "smooth"
+              show_symbol: false
+              connect_nulls: false
+              aggregation: "last"
+            queryType: "sql"
+            queries:
+              - query: SELECT histogram(_timestamp) as "x_axis_1", count(*) as "y_axis_1" FROM "testdata" GROUP BY x_axis_1 ORDER BY x_axis_1 ASC
+                vrlFunctionQuery: ""
+                customQuery: false
+                fields:
+                  stream: "default"
+                  stream_type: "logs"
+                  "x":
+                    - label: "Timestamp"
+                      alias: "x_axis_1"
+                      type: "build"
+                      color: null
+                      functionName: "histogram"
+                      sortBy: "ASC"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "_timestamp"
+                            streamAlias: null
+                        - type: "histogramInterval"
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "y":
+                    - label: "Count"
+                      alias: "y_axis_1"
+                      type: "build"
+                      color: "#5960b2"
+                      functionName: "count"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "*"
+                            streamAlias: null
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "z": []
+                  breakdown: []
+                  filter:
+                    filterType: "group"
+                    logicalOperator: "AND"
+                    conditions: []
+                config:
+                  promql_legend: ""
+                  layer_type: "scatter"
+                  weight_fixed: 1
+                  limit: 0
+                  min: 0
+                  max: 100
+                  time_shift: []
+                joins: []
+            layout:
+              x: 96
+              y: 0
+              w: 96
+              h: 18
+              i: 2
+            htmlContent: ""
+            markdownContent: ""
+            customChartContent: ""
+
+      # ======================================
+      # Tab 3: Tab3
+      # ======================================
+      - tabId: "tab-003"
+        name: "Tab3"
+        panels: 
+          - id: "panel-001"
+            title: "Panel1"
+            type: "area"
+            description: "System performance metrics over time"
+            config:
+              show_legends: true
+              decimals: 2
+              line_thickness: 1.5
+              show_gridlines: true
+              line_interpolation: "smooth"
+              show_symbol: false
+              connect_nulls: false
+              aggregation: "last"
+            queryType: "sql"
+            queries:
+              - query: SELECT histogram(_timestamp) as "x_axis_1", count(*) as "y_axis_1" FROM "testdata" GROUP BY x_axis_1 ORDER BY x_axis_1 ASC
+                vrlFunctionQuery: ""
+                customQuery: false
+                fields:
+                  stream: "default"
+                  stream_type: "logs"
+                  "x":
+                    - label: "Timestamp"
+                      alias: "x_axis_1"
+                      type: "build"
+                      color: null
+                      functionName: "histogram"
+                      sortBy: "ASC"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "_timestamp"
+                            streamAlias: null
+                        - type: "histogramInterval"
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "y":
+                    - label: "Count"
+                      alias: "y_axis_1"
+                      type: "build"
+                      color: "#5960b2"
+                      functionName: "count"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "*"
+                            streamAlias: null
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "z": []
+                  breakdown: []
+                  filter:
+                    filterType: "group"
+                    logicalOperator: "AND"
+                    conditions: []
+                config:
+                  promql_legend: ""
+                  layer_type: "scatter"
+                  weight_fixed: 1
+                  limit: 0
+                  min: 0
+                  max: 100
+                  time_shift: []
+                joins: []
+            layout:
+              x: 0
+              y: 0
+              w: 96
+              h: 18
+              i: 1
+            htmlContent: ""
+            markdownContent: ""
+            customChartContent: ""
+          - id: "panel-002"
+            title: "Panel2"
+            type: "bar"
+            description: "System performance metrics over time"
+            config:
+              show_legends: true
+              decimals: 2
+              line_thickness: 1.5
+              show_gridlines: true
+              line_interpolation: "smooth"
+              show_symbol: false
+              connect_nulls: false
+              aggregation: "last"
+            queryType: "sql"
+            queries:
+              - query: SELECT histogram(_timestamp) as "x_axis_1", count(*) as "y_axis_1" FROM "testdata" GROUP BY x_axis_1 ORDER BY x_axis_1 ASC
+                vrlFunctionQuery: ""
+                customQuery: false
+                fields:
+                  stream: "default"
+                  stream_type: "logs"
+                  "x":
+                    - label: "Timestamp"
+                      alias: "x_axis_1"
+                      type: "build"
+                      color: null
+                      functionName: "histogram"
+                      sortBy: "ASC"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "_timestamp"
+                            streamAlias: null
+                        - type: "histogramInterval"
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "y":
+                    - label: "Count"
+                      alias: "y_axis_1"
+                      type: "build"
+                      color: "#5960b2"
+                      functionName: "count"
+                      args:
+                        - type: "field"
+                          value:
+                            field: "*"
+                            streamAlias: null
+                      isDerived: false
+                      havingConditions: []
+                      treatAsNonTimestamp: true
+                      showFieldAsJson: false
+                  "z": []
+                  breakdown: []
+                  filter:
+                    filterType: "group"
+                    logicalOperator: "AND"
+                    conditions: []
+                config:
+                  promql_legend: ""
+                  layer_type: "scatter"
+                  weight_fixed: 1
+                  limit: 0
+                  min: 0
+                  max: 100
+                  time_shift: []
+                joins: []
+            layout:
+              x: 96
+              y: 0
+              w: 96
+              h: 18
+              i: 2
+            htmlContent: ""
+            markdownContent: ""
+            customChartContent: ""
