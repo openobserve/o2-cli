@@ -6,7 +6,7 @@ Sample destination configurations for O2 CLI.
 
 ```yaml
 name: "destination-name"              # Required
-type: http                            # Required: http, email, sns
+type: http                            # Required: http, email
 url: "https://webhook.url"            # Required for http
 method: post                          # Optional: post, put, get (default: post)
 headers:                              # Optional
@@ -81,15 +81,6 @@ emails:
 template: "email-html-alert"
 ```
 
-**SNS Alert:**
-```yaml
-name: "sns-alerts"
-type: sns
-actionId: "arn:aws:sns:..."
-awsRegion: "us-east-1"
-snsTopicArn: "arn:aws:sns:..."
-```
-
 ### Pipeline Destinations
 Used for **data forwarding** in pipelines.
 
@@ -109,10 +100,14 @@ headers:
 name: "es-pipeline"
 type: http
 destinationTypeName: elasticsearch
-url: "https://elasticsearch.company.com:9200"
+url: "https://elasticsearch.company.com:9200/_bulk"
 method: post
 headers:
   Authorization: "Basic BASE64"
+  Content-Type: "application/x-ndjson"
+outputFormat:
+  esbulk:
+    index: "logs"
 ```
 
 ## 💡 Destination Commands
@@ -126,7 +121,6 @@ o2 dest list
 # Filter by type
 o2 list dest --type http
 o2 list dest --type email
-o2 list dest --type sns
 
 # Different output formats
 o2 list dest --output json
@@ -198,7 +192,7 @@ o2 delete dest slack-alerts
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `name` | string | ✅ | Unique destination name |
-| `type` | string | ✅ | http, email, or sns |
+| `type` | string | ✅ | http or email |
 | `url` | string | For http | Webhook URL |
 | `method` | string | No | post, put, get (default: post) |
 | `headers` | map | No | HTTP headers |
@@ -206,6 +200,7 @@ o2 delete dest slack-alerts
 | `emails` | array | For email | Email addresses |
 | `skipTlsVerify` | bool | No | Skip TLS verification |
 | `destinationTypeName` | string | No | For pipelines: splunk, elasticsearch, etc. |
+| `outputFormat` | string/object | No | Format for pipeline destinations (json, nestedevent, or object) |
 
 ## 🎯 Examples
 
@@ -249,6 +244,7 @@ url: "https://splunk.company.com:8088/services/collector"
 method: post
 headers:
   Authorization: "Splunk YOUR-HEC-TOKEN"
+outputFormat: nestedevent
 ```
 
 ## 🔗 More Information

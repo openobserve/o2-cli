@@ -15,11 +15,11 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   name: "test_failure_demo"
-  org: "dev"
+  org: "default"
 
   # This function has an intentional error to demonstrate test failure
   function: |

@@ -10,7 +10,7 @@ metadata:
   namespace: o2operator          # Target namespace for the alert template resource
 spec:
   configRef:
-    name: openobserve-test-operator       # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account       # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
 
   # Alert template configuration

@@ -14,11 +14,11 @@
 apiVersion: openobserve.ai/v1alpha1
 kind: OpenObserveDashboard
 metadata:
-  name: dashboard1  # Kubernetes resource name
+  name: dashboard1   # Kubernetes resource name
   namespace: o2operator              # Target namespace
 spec:
   configRef:
-    name: openobserve-mdmosaraf           # OpenObserveConfig reference (Required)
+    name: openobserve-account           # OpenObserveConfig reference (Required)
     namespace: o2operator
 
   # Dashboard identification

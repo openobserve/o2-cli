@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   # Destination configuration
   name: splunk-pipeline-dest
-  org: "dev"                     # Organization name
+  org: "default"                     # Organization name
 
   # Pipeline destination specific fields
   type: http                        # Always http for pipeline destinations

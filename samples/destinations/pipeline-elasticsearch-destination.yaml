@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   # Destination configuration
   name: elasticsearch-pipeline-dest
-  org: "dev"
+  org: "default"
 
   # Pipeline destination specific fields
   type: http                           # Always http for pipeline destinations
@@ -29,14 +29,16 @@ spec:
     Content-Type: "application/x-ndjson"
 
   # Elasticsearch bulk format configuration
-  outputFormat:                       # Output format for Elasticsearch bulk API (Required)
+  # The API expects a nested object structure for Elasticsearch
+  outputFormat:
     esbulk:
-      index: "openobserve-logs"       # Target index name in Elasticsearch
+      index: "logs"                   # Index name for Elasticsearch (optional, defaults to 'logs')
 
   skipTlsVerify: false
 
   # Notes:
   # - This is a pipeline destination because destinationTypeName is set to 'elasticsearch'
-  # - outputFormat MUST be 'esbulk' for Elasticsearch destinations
+  # - outputFormat MUST be a nested object with 'esbulk' key for Elasticsearch destinations
+  # - The 'esbulk' object can contain an optional 'index' field (defaults to 'logs')
   # - The URL should point to the _bulk endpoint
   # - Content-Type should be 'application/x-ndjson' for bulk operations

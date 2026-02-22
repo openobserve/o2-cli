@@ -18,7 +18,7 @@ metadata:
   namespace: o2operator              # Target namespace
 spec:
   configRef:
-    name: openobserve-mdmosaraf           # OpenObserveConfig reference (Required)
+    name: openobserve-account           # OpenObserveConfig reference (Required)
     namespace: o2operator
 
   # Dashboard identification
@@ -115,13 +115,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -149,7 +149,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -164,7 +164,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -261,13 +261,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -295,7 +295,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -310,7 +310,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -407,13 +407,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -441,7 +441,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -456,7 +456,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -553,13 +553,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -587,7 +587,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -602,7 +602,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -699,13 +699,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -733,7 +733,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -748,7 +748,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -845,13 +845,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -879,7 +879,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -894,7 +894,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -994,13 +994,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -1028,7 +1028,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -1043,7 +1043,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -1140,13 +1140,13 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT histogram(_timestamp) as "x_axis_1", count(c_ip)
-            as "y_axis_1", c_country as "breakdown_1" FROM "testdata"  GROUP BY x_axis_1,
+        - query: SELECT histogram(_timestamp) as "x_axis_1", count(k8s_namespace_name)
+            as "y_axis_1", k8s_cluster as "breakdown_1" FROM "k8s_events"  GROUP BY x_axis_1,
             breakdown_1 ORDER BY x_axis_1 ASC
           vrlFunctionQuery: ''
           customQuery: false
           fields:
-            stream: testdata
+            stream: k8s_events
             stream_type: logs
             "x":
             - label: Timestamp
@@ -1174,7 +1174,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: k8s_namespace_name
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -1189,7 +1189,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_country
+                  field: k8s_cluster
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -1287,7 +1287,7 @@ spec:
         queryType: sql
         queries:
         - query: SELECT geo_city_latitude as "latitude", geo_city_longitude as "longitude",
-            count(c_ip) as "weight" FROM "testdata"  GROUP BY latitude, longitude
+            count(c_country) as "weight" FROM "testdata"  GROUP BY latitude, longitude
           vrlFunctionQuery: ''
           customQuery: false
           fields:
@@ -1330,7 +1330,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: c_country
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -1427,7 +1427,7 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT c_ip as "name", count(distinct c_ip) as "value_for_maps"
+        - query: SELECT c_country as "name", count(distinct c_ip) as "value_for_maps"
             FROM "testdata" GROUP BY name
           vrlFunctionQuery: ''
           customQuery: true
@@ -1819,7 +1819,7 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT sc_status as "x_axis_1", _timestamp as "y_axis_1", count(c_ip)
+        - query: SELECT sc_status as "x_axis_1", _timestamp as "y_axis_1", count(c_country)
             as "z_axis_1" FROM "testdata"  GROUP BY x_axis_1, y_axis_1
           vrlFunctionQuery: ''
           customQuery: false
@@ -1863,7 +1863,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: c_country
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -1961,7 +1961,7 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT sc_status as "x_axis_1", count(c_ip) as "y_axis_1" FROM "testdata"  GROUP
+        - query: SELECT sc_status as "x_axis_1", count(c_country) as "y_axis_1" FROM "testdata"  GROUP
             BY x_axis_1
           vrlFunctionQuery: ''
           customQuery: false
@@ -1991,7 +1991,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: c_country
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -2092,7 +2092,7 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT count(c_ip) as "y_axis_1" FROM "testdata"
+        - query: SELECT count(c_country) as "y_axis_1" FROM "testdata"
           vrlFunctionQuery: ''
           customQuery: false
           fields:
@@ -2108,7 +2108,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: c_country
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -2209,7 +2209,7 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT count(c_ip) as "y_axis_1" FROM "testdata"
+        - query: SELECT count(c_country) as "y_axis_1" FROM "testdata"
           vrlFunctionQuery: ''
           customQuery: false
           fields:
@@ -2225,7 +2225,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: c_country
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -2535,7 +2535,7 @@ spec:
           sticky_columns: []
         queryType: sql
         queries:
-        - query: SELECT c_ip as "source", sc_status as "target", count(_timestamp)
+        - query: SELECT c_country as "source", sc_status as "target", count(_timestamp)
             as "value" FROM "testdata"  GROUP BY source, target
           vrlFunctionQuery: ''
           customQuery: false
@@ -2554,7 +2554,7 @@ spec:
               args:
               - type: field
                 value:
-                  field: c_ip
+                  field: c_country
                   streamAlias: null
               isDerived: false
               havingConditions: []
@@ -2714,7 +2714,7 @@ spec:
           \ \n// Define your ECharts 'option' here. \n// 'data' variable is available\
           \ for use and contains the response data from the search result and it is an\
           \ array.\n\n// Basic Line Chart\n\n// Example Query:\nSELECT\n  histogram(_timestamp)\
-          \ as \"x_axis_1\",\n  count(c_ip) as \"y_axis_1\"\nFROM \"default\"\nGROUP\
+          \ as \"x_axis_1\",\n  count(c_country) as \"y_axis_1\"\nFROM \"default\"\nGROUP\
           \ BY x_axis_1\nORDER BY x_axis_1 ASC\n//\n// -----------------------------------------------------------\n\
           // IMPORTANT: Update the aliases below to match your query!\n\nconst xAlias\
           \ = \"x_axis_1\";\nconst yAlias = \"y_axis_1\";\n// -----------------------------------------------------------\n\

@@ -10,11 +10,11 @@ metadata:
   namespace: o2operator              # Target namespace for the function resource
 spec:
   configRef:
-    name: openobserve-main           # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account           # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator            # Namespace of the config (Optional, defaults to function namespace)
 
   name: "basic_transformation"       # Function name in OpenObserve (Required)
-  org: "dev"                        # Organization name (Optional, uses configRef org if not specified)
+  org: "default"                        # Organization name (Optional, uses configRef org if not specified)
 
   # Simple VRL function to add a timestamp field
   function: |

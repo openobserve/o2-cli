@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator          # Target namespace for the destination resource
 spec:
   configRef:
-    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account       # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
 
   # Destination configuration
   name: email-alert-dest         # Unique identifier for the destination (Required)
-  org: "dev"                 # Organization name (Optional, defaults to org from ConfigRef)
+  org: "default"                 # Organization name (Optional, defaults to org from ConfigRef)
 
   # Email destination specific fields
   type: email                    # Destination type (Required: email for alert destinations)
@@ -24,7 +24,7 @@ spec:
   - alerts@example.com
 
   method: post                   # HTTP method (Optional, defaults to post)
-  template: email-notification # Reference to an existing alert template (Required for alert destinations)
+  template: prebuilt_email # Reference to an existing alert template (Required for alert destinations)
 
   # Notes:
   # - For email type, this is always an alert destination

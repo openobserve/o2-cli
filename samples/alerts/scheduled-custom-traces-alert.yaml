@@ -12,7 +12,7 @@ metadata:
   namespace: o2operator       # Target namespace for the alert resource
 spec:
   configRef:
-    name: openobserve-main         # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account         # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator      # Namespace of the config (Optional, defaults to alert namespace)
 
   name: "scheduled-custom-traces-alert"
@@ -22,7 +22,7 @@ spec:
   streamType: "traces"
   isRealTime: false
   folderName: "test_alerts"
-  org: "dev"
+  org: "default"
 
   queryCondition:
     type: "custom"
@@ -121,7 +121,7 @@ spec:
     timeWindowMinutes: 60
 
   destinations:
-    - "test-o2-alerts"      
+    - "test_slack"      
 
   contextAttributes:
     - name: "environment"     

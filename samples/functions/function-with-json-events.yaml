@@ -13,11 +13,11 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   name: "json_events_function"
-  org: "dev"
+  org: "default"
 
   # Function that processes different log types
   function: |
@@ -75,7 +75,7 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   name: "generated_test_function"
@@ -116,7 +116,7 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   name: "complex_json_function"

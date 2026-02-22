@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator          # Target namespace for the destination resource
 spec:
   configRef:
-    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account       # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
 
   # Destination configuration
   name: "webhook-alert-dest"       # Unique identifier for the destination (Required)
-  org: "dev"                 # Organization name (Optional, defaults to org from ConfigRef)
+  org: "default"                 # Organization name (Optional, defaults to org from ConfigRef)
 
   # HTTP destination specific fields
   type: "http"                     # Destination type (Required: http for webhook destinations)
@@ -30,7 +30,7 @@ spec:
 
   outputFormat: "json"                        # Output format (Optional: json, nestedevent)
   skipTlsVerify: false                      # Whether to skip TLS certificate verification (Optional, defaults to false)
-  template: "http-critical-alert"            # Reference to an existing alert template for formatting (Required for alert destinations)
+  template: "prebuilt_slack"            # Reference to an existing alert template for formatting (Required for alert destinations)
 
   # Notes:
   # - This is an alert destination because destinationTypeName is not set

@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator           # Target namespace for the destination resource
 spec:
   configRef:
-    name: openobserve-main        # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account        # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator         # Namespace of the config (Optional, defaults to same namespace)
 
   # Destination configuration
   name: newrelic-pipeline-dest   # Unique identifier for the destination (Required)
-  org: "dev"                  # Organization name (Optional, defaults to org from ConfigRef)
+  org: "default"                  # Organization name (Optional, defaults to org from ConfigRef)
 
   # Pipeline destination specific fields
   type: http                      # Destination type (Required: http for pipeline destinations)

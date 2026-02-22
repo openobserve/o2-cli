@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator          # Target namespace for the alert template resource
 spec:
   configRef:
-    name: openobserve-main       # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account       # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator        # Namespace of the config (Optional, defaults to same namespace)
 
   # Alert template configuration
   name: "email-notification"    # Unique identifier for the alert template (Required)
-  org: "dev"              # Organization name (Optional, defaults to org from ConfigRef)
+  org: "default"              # Organization name (Optional, defaults to org from ConfigRef)
 
   # Template content
   title: "[{severity}] Alert: {alert_name} - {org_name}"   # Email subject (Required)

@@ -11,7 +11,7 @@ metadata:
   namespace: o2operator           # Target namespace for the pipeline resource
 spec:
   configRef:
-    name: openobserve-main         # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account         # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator      # Namespace of the config (Optional, defaults to pipeline namespace)
 
   # ============================================================================
@@ -40,7 +40,7 @@ spec:
   # - Usually auto-determined from configRef
   # - Override only if targeting different org
   # org: "36CfiJ6JJXPwp516SByGIMqmPVs"
-  org: "dev"
+  org: "default"
 
   # ============================================================================
   # DATA SOURCE CONFIGURATION (Required)

@@ -48,9 +48,14 @@ o2 configure --profile prod     # Configure prod profile
 - OpenObserve Endpoint URL
 - Organization name
 - Username
-- Password
+- Account type selection:
+  1. User account (uses password)
+  2. Service account (uses token)
+- Password (for user accounts) OR Token (for service accounts)
 
 **Config saved to:** `~/.o2/config.yaml`
+
+**Note:** Service accounts have limited permissions and cannot access report folders
 
 ---
 
@@ -204,7 +209,7 @@ o2 dest list                    # Alternative syntax
 ```
 
 **Flags:**
-- `--type <type>` - Filter by type: `http`, `email`, `sns`
+- `--type <type>` - Filter by type: `http`, `email`
 - All global flags
 
 **Example Output:**
@@ -234,6 +239,32 @@ o2 pipeline list                # Alternative syntax
 ```
 NAME          STREAM_TYPE   ENABLED
 parse_nginx                 true
+```
+
+---
+
+### `o2 list folder`
+**Aliases:** `folders`
+
+**Description:** List folders
+
+**Usage:**
+```bash
+o2 list folder                  # List alert folders (default)
+o2 list folder --type dashboards
+o2 list folder --type reports
+o2 folder list --type alerts    # Alternative syntax
+```
+
+**Flags:**
+- `--type <type>` - Folder type: `alerts`, `dashboards`, `reports` (default: "alerts")
+- All global flags
+
+**Example Output:**
+```
+ID                    NAME              TYPE        DESCRIPTION
+7417863561566760960   default           alerts      Default folder
+7417863561566760961   ProductionAlerts  alerts      Production monitoring
 ```
 
 ---
@@ -409,6 +440,34 @@ o2 pipeline create -f pipeline.yaml    # Alternative
 
 ---
 
+### `o2 create folder`
+
+**Description:** Create a new folder
+
+**Usage:**
+```bash
+o2 create folder production-alerts
+o2 create folder monitoring --type dashboards
+o2 create folder quarterly --type reports --description "Quarterly reports"
+o2 folder create dev-alerts --description "Development alerts"
+```
+
+**Flags:**
+- `--type <type>` - Folder type: `alerts`, `dashboards`, `reports` (default: "alerts")
+- `--description <desc>` - Folder description
+- All global flags
+
+**Example:**
+```bash
+# Create alert folder
+o2 create folder ProductionAlerts --description "Production monitoring"
+
+# Create dashboard folder
+o2 create folder Monitoring --type dashboards
+```
+
+---
+
 ### `o2 create function`
 **Aliases:** `func`
 
@@ -548,6 +607,28 @@ o2 pipeline get my-pipeline             # Alternative
 
 ---
 
+### `o2 get folder <name>`
+
+**Description:** Get folder details
+
+**Usage:**
+```bash
+o2 get folder ProductionAlerts                      # Get alert folder by name
+o2 get folder Infrastructure --type dashboards      # Get dashboard folder by name
+o2 get folder 7417863561566760960 --by-id          # Get alert folder by ID
+o2 get folder 7417863561566760960 --by-id --type dashboards  # Get dashboard folder by ID
+o2 folder get quarterly --type reports             # Alternative syntax
+```
+
+**Flags:**
+- `--type <type>` - Folder type: `alerts`, `dashboards`, `reports` (default: "alerts")
+- `--by-id` - Treat argument as folder ID instead of name (required when using IDs)
+- All global flags
+
+**Note:** Folders are namespaced by type. "Infrastructure" in alerts is different from "Infrastructure" in dashboards.
+
+---
+
 ### `o2 get function <name>`
 **Aliases:** `func`
 
@@ -587,18 +668,19 @@ o2 dashboard get 7417863561566760960    # Alternative
 ### `o2 update alert`
 **Aliases:** `alerts`
 
-**Description:** Update alert from file
+**Description:** Update alert by name or ID
 
 **Usage:**
 ```bash
 o2 update alert -f alert.yaml              # Auto-extract name from file
-o2 update alert my-alert -f updated.yaml   # Explicit name
+o2 update alert my-alert -f updated.yaml   # Update by name
+o2 update alert 39z0R4KJlK5uyj0it2mmndNP2HC -f updated.yaml  # Update by ID
 o2 alert update -f alert.yaml              # Alternative
 ```
 
 **Flags:**
 - `-f, --file <path>` - Alert YAML file (required)
-- `[alert-name]` - Optional if name is in file
+- `[alert-name-or-id]` - Alert name or ID (optional if name is in file, IDs auto-detected if >20 chars)
 - All global flags
 
 ---
@@ -656,6 +738,28 @@ o2 pipeline update -f pipeline.yaml           # Alternative
 
 ---
 
+### `o2 update folder`
+
+**Description:** Update folder details
+
+**Usage:**
+```bash
+o2 update folder 7417863561566760960 --name "New Name"
+o2 update folder 7417863561566760960 --description "Updated description"
+o2 update folder 7417863561566760960 --name "Prod" --description "Production folder"
+o2 folder update 7417863561566760960 --type dashboards --name "Dashboard Storage"
+```
+
+**Flags:**
+- `--type <type>` - Folder type: `alerts`, `dashboards`, `reports` (default: "alerts")
+- `--name <name>` - New folder name
+- `--description <desc>` - New folder description
+- All global flags
+
+**Note:** Requires folder ID, not name
+
+---
+
 ### `o2 update function`
 **Aliases:** `func`
 
@@ -697,21 +801,23 @@ o2 dashboard update 7417863561566760960 -f updated.yaml  # Alternative
 ### `o2 delete alert`
 **Aliases:** `alerts`
 
-**Description:** Delete alert by name or from file
+**Description:** Delete alert by name, ID, or from file
 
 **Usage:**
 ```bash
 o2 delete alert my-alert                # By name
+o2 delete alert 39z0R4KJlK5uyj0it2mmndNP2HC  # By alert ID (auto-detected if >20 chars)
 o2 delete alert -f alert.yaml           # From file
 o2 alert delete my-alert                # Alternative
 ```
 
 **Flags:**
-- `[alert-name]` - Alert name OR
+- `[alert-name-or-id]` - Alert name or ID (IDs are auto-detected if >20 chars)
 - `-f, --file <path>` - Extract name from file
+- `--folder <name>` - Specify folder to search (optional, improves performance)
 - All global flags
 
-**Important:** Use alert **name** (not ID). Get name from `o2 list alert`.
+**Important:** You can use either alert **name** or **ID**. Get both from `o2 list alert`.
 
 ---
 
@@ -770,6 +876,25 @@ o2 pipeline delete my-pipeline          # Alternative
 
 ---
 
+### `o2 delete folder`
+
+**Description:** Delete folder
+
+**Usage:**
+```bash
+o2 delete folder 7417863561566760960
+o2 delete folder 7417863561566760960 --type dashboards
+o2 folder delete 7417863561566760960 --type reports
+```
+
+**Flags:**
+- `--type <type>` - Folder type: `alerts`, `dashboards`, `reports` (default: "alerts")
+- All global flags
+
+**Note:** Requires folder ID. Cannot delete default folders or folders with resources.
+
+---
+
 ### `o2 delete function`
 **Aliases:** `func`
 
@@ -807,6 +932,44 @@ o2 dashboard delete 7417863561566760960         # Alternative
 - All global flags
 
 **Important:** Dashboard delete requires **dashboard ID** (not file). Get ID from `o2 list dashboard`.
+
+---
+
+## 🔧 Alert-Specific Commands
+
+### `o2 alert enable <name>`
+
+**Description:** Enable a disabled alert
+
+**Usage:**
+```bash
+o2 alert enable my-alert                       # Enable alert (searches all folders)
+o2 alert enable my-alert --folder production   # Enable alert in specific folder
+```
+
+**Flags:**
+- `--folder <name>` - Folder name (optional, searches all if not specified)
+- All global flags
+
+**Note:** For service accounts, folder is required. For user accounts, it will search all folders if not specified.
+
+---
+
+### `o2 alert disable <name>`
+
+**Description:** Disable an enabled alert
+
+**Usage:**
+```bash
+o2 alert disable my-alert                      # Disable alert (searches all folders)
+o2 alert disable my-alert --folder production  # Disable alert in specific folder
+```
+
+**Flags:**
+- `--folder <name>` - Folder name (optional, searches all if not specified)
+- All global flags
+
+**Note:** For service accounts, folder is required. For user accounts, it will search all folders if not specified.
 
 ---
 
@@ -917,6 +1080,45 @@ o2 delete function -f function.yaml
 
 ---
 
+### Folder Commands
+
+```bash
+# List
+o2 list folder
+o2 list folder --type dashboards
+o2 folder list --type reports
+
+# Get
+o2 get folder ProductionAlerts
+o2 get folder 7417863561566760960 --by-id
+o2 folder get monitoring --type dashboards
+
+# Create
+o2 create folder production-alerts
+o2 create folder monitoring --type dashboards --description "Monitoring dashboards"
+o2 folder create quarterly --type reports
+
+# Update (requires ID)
+o2 update folder 7417863561566760960 --name "New Name"
+o2 update folder 7417863561566760960 --description "Updated description"
+o2 folder update 7417863561566760960 --name "Prod" --description "Production"
+
+# Delete (requires ID)
+o2 delete folder 7417863561566760960
+o2 delete folder 7417863561566760960 --type dashboards
+o2 folder delete 7417863561566760960 --type reports
+```
+
+**Important:**
+- Folders are **namespaced by type** - the same name can exist in alerts, dashboards, and reports as separate folders
+- Always specify `--type` when working with non-alert folders (default is "alerts")
+- When using folder IDs instead of names, you must use the `--by-id` flag
+- Service accounts require folders for accessing resources
+- Cannot delete default folders or folders with resources
+- Update and delete operations require folder ID
+
+---
+
 ### Dashboard Commands
 
 ```bash
@@ -995,35 +1197,44 @@ o2 alert get my-alert
 o2 create alert -f alert.yaml
 o2 alert create -f alert.yaml
 
-# Update (name optional)
+# Update (by name or ID, optional if in file)
 o2 update alert -f alert.yaml
 o2 update alert my-alert -f updated.yaml
+o2 update alert 39z0R4KJlK5uyj0it2mmndNP2HC -f updated.yaml
 o2 alert update -f alert.yaml
 
-# Delete (by name or file)
+# Delete (by name, ID, or file)
 o2 delete alert my-alert
+o2 delete alert 39z0R4KJlK5uyj0it2mmndNP2HC
 o2 delete alert -f alert.yaml
 o2 alert delete my-alert
+
+# Enable/Disable (by name)
+o2 alert enable my-alert
+o2 alert enable my-alert --folder ProductionAlerts
+o2 alert disable my-alert
+o2 alert disable my-alert --folder ProductionAlerts
 ```
 
 **Important:**
-- Delete uses alert **name** (e.g., `my-alert`), not alert ID
-- Get the name from `o2 list alert`
+- Delete accepts alert **name** (e.g., `my-alert`) or **ID** (e.g., `39z0R4KJlK5uyj0it2mmndNP2HC`)
+- Get the name and ID from `o2 list alert`
 - Template must exist before creating alert destination
 
 ---
 
 ## 🎯 Complete Command Matrix
 
-| Resource | List | Get | Create | Update | Delete |
-|----------|------|-----|--------|--------|--------|
-| Organizations | ✅ | ✅ (+ summary) | ✅ | N/A | N/A |
-| Dashboards | ✅ | ✅ | ✅ | ✅ | ✅ (by ID) |
-| Alerts | ✅ | ✅ | ✅ | ✅ | ✅ (by name) |
-| Templates | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Destinations | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Pipelines | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Functions | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Resource | List | Get | Create | Update | Delete | Enable/Disable |
+|----------|------|-----|--------|--------|--------|----------------|
+| Organizations | ✅ | ✅ (+ summary) | ✅ | N/A | N/A | N/A |
+| Folders | ✅ | ✅ | ✅ | ✅ (by ID) | ✅ (by ID) | N/A |
+| Dashboards | ✅ | ✅ | ✅ | ✅ | ✅ (by ID) | N/A |
+| Alerts | ✅ | ✅ | ✅ | ✅ | ✅ (by name/ID) | ✅ |
+| Templates | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
+| Destinations | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
+| Pipelines | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
+| Functions | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
 
 ---
 
@@ -1064,6 +1275,28 @@ Mix and match as needed:
 o2 list template                    # Verb-first
 o2 template create -f template.yaml # Resource-first
 o2 delete dest old-dest             # Verb-first
+```
+
+### 6. **Service Account vs User Account**
+Understanding authentication differences:
+
+**Service Accounts:**
+- Use tokens for authentication
+- Require folder specification for most operations
+- Cannot access report folders
+- Limited to programmatic access within assigned folders
+
+**User Accounts:**
+- Use passwords for authentication
+- Can search across all folders
+- Full administrative permissions
+- Can access reports and all folder types
+
+Configure appropriately:
+```bash
+o2 configure --profile prod        # Interactive setup (prompts for account type)
+o2 list alert --folder production  # Service accounts need --folder
+o2 list alert                      # User accounts can list all
 ```
 
 ---

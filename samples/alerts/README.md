@@ -75,8 +75,15 @@ o2 update alert my-alert -f updated-alert.yaml
 o2 delete alert my-alert
 o2 alert delete my-alert
 
+# Delete by alert ID (auto-detected if >20 chars)
+o2 delete alert 39z0R4KJlK5uyj0it2mmndNP2HC
+o2 alert delete 39z0UvlUO3opiIQGmlwiUXxI9jl
+
 # Delete from file (extracts name from file)
 o2 delete alert -f alert.yaml
+
+# Delete from specific folder
+o2 delete alert my-alert --folder ProductionAlerts
 ```
 
 ### Enable/Disable Alert

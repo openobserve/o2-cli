@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   # Destination configuration
   name: datadog-pipeline-dest
-  org: "dev"
+  org: "default"
 
   # Pipeline destination specific fields
   type: http                        # Always http for pipeline destinations

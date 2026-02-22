@@ -10,11 +10,11 @@ metadata:
   namespace: o2operator              # Target namespace for the function resource
 spec:
   configRef:
-    name: openobserve-main           # Name of the OpenObserveConfig resource (Required)
+    name: openobserve-account           # Name of the OpenObserveConfig resource (Required)
     namespace: o2operator            # Namespace of the config (Optional)
 
   name: "tested_function"            # Function name in OpenObserve (Required)
-  org: "dev"                        # Organization name (Optional)
+  org: "default"                        # Organization name (Optional)
 
   # VRL function to add custom field
   function: |

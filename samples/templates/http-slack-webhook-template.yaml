@@ -10,12 +10,12 @@ metadata:
   namespace: o2operator
 spec:
   configRef:
-    name: openobserve-main
+    name: openobserve-account
     namespace: o2operator
 
   # Alert template configuration
   name: "slack-webhook-notification"    # Unique identifier for the alert template
-  org: "dev"                            # Organization name
+  org: "default"                            # Organization name
 
   # Template content
   title: "Slack Alert: {alert_name}"  # Title of the alert template
