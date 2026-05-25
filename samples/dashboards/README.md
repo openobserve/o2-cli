@@ -96,7 +96,7 @@ Dashboards use **full Kubernetes format** (includes apiVersion, kind, metadata, 
 Example structure:
 ```yaml
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveDashboard
+kind: Dashboard
 metadata:
   name: my-dashboard
   namespace: o2operator

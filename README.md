@@ -43,7 +43,8 @@ O2 CLI requires **OpenObserve Enterprise** edition. It will not work with the co
 ### **Resource Management**
 - ✅ **6 Resources with Full CRUD**: Dashboards, Templates, Destinations, Pipelines, Functions, Alerts
 - ✅ **7 Resources Queryable**: Including Organizations
-- ✅ **Simple YAML Format**: No Kubernetes wrapper needed (for most resources)
+- ✅ **Raw API Format by Default**: Pass the OpenObserve API JSON directly — no Kubernetes wrapper needed
+- ✅ **CRD Format Supported**: Use `--crd` flag to use Kubernetes CRD YAML format
 
 ### **Enterprise Capabilities**
 - ✅ **Multi-Environment**: Unlimited profiles (dev, staging, prod)
@@ -126,8 +127,11 @@ o2 list alert --folder default --enabled-only
 
 ### 3. Manage Resources
 ```bash
-# Create a template
-o2 create template -f slack-alert.yaml
+# Create a template (raw API format, default)
+o2 create template -f slack-alert.json
+
+# Create using Kubernetes CRD format
+o2 create template -f slack-alert.yaml --crd
 
 # List templates
 o2 list template
@@ -201,8 +205,8 @@ o2 <verb> <resource> [name] [flags]
 # Examples:
 o2 list template
 o2 get dashboard 123456
-o2 create template -f template.yaml
-o2 update pipeline -f pipeline.yaml
+o2 create template -f template.json
+o2 update pipeline -f pipeline.yaml --crd
 o2 delete function my-function
 ```
 
@@ -213,12 +217,30 @@ o2 <resource> <verb> [name] [flags]
 # Examples:
 o2 template list
 o2 dashboard get 123456
-o2 template create -f template.yaml
-o2 pipeline update -f pipeline.yaml
+o2 template create -f template.json
+o2 pipeline update -f pipeline.yaml --crd
 o2 function delete my-function
 ```
 
 **Both syntaxes do the same thing!**
+
+### **File Format Flags (create commands)**
+
+| Flag | Description |
+|------|-------------|
+| _(none)_ | **Default** — raw OpenObserve API JSON format |
+| `--crd` | Kubernetes CRD YAML format (full `apiVersion`/`kind`/`spec` wrapper) |
+| `--folder <name>` | Override the target folder (alerts and dashboards only) |
+
+```bash
+# Raw API format (default) — use JSON exported directly from OpenObserve
+o2 create alert -f pod_failed.json
+o2 create alert -f pod_failed.json --folder my-team
+
+# Kubernetes CRD format
+o2 create alert -f pod_failed.yaml --crd
+o2 create alert -f pod_failed.yaml --crd --folder my-team
+```
 
 ---
 
@@ -226,17 +248,17 @@ o2 function delete my-function
 
 ### Multi-Environment Workflow
 ```bash
-# Create in dev
-o2 create template -f alert.yaml --profile dev
+# Create in dev (raw API format, default)
+o2 create template -f alert.json --profile dev
 
 # Test it
 o2 list template --profile dev
 
 # Export from dev
-o2 get template MyAlert --profile dev -o yaml > tested.yaml
+o2 get template MyAlert --profile dev -o json > tested.json
 
 # Deploy to prod
-o2 create template -f tested.yaml --profile prod
+o2 create template -f tested.json --profile prod
 ```
 
 ### Cross-Organization Querying
@@ -252,27 +274,27 @@ o2 list function --org org3
 
 ### Backup and Restore
 ```bash
-# Backup all templates
+# Backup all templates (exports raw API format JSON)
 for t in $(o2 list template --output json | jq -r '.[].name'); do
-  o2 get template $t -o yaml > backups/${t}.yaml
+  o2 get template $t -o json > backups/${t}.json
 done
 
-# Restore templates
-for f in backups/*.yaml; do
+# Restore templates (raw format is the default)
+for f in backups/*.json; do
   o2 create template -f $f
 done
 ```
 
 ### Resource Management
 ```bash
-# Create destination
-o2 create dest -f slack-webhook.yaml
+# Create destination (raw API format, default)
+o2 create dest -f slack-webhook.json
 
 # List HTTP destinations
 o2 list dest --type http
 
 # Update destination
-o2 update dest -f updated-webhook.yaml
+o2 update dest -f updated-webhook.json
 
 # Delete destination
 o2 delete dest slack-webhook
@@ -330,42 +352,51 @@ o2 get organization myorg --summary
 
 ### Templates
 ```bash
-o2 create template -f template.yaml
+o2 create template -f template.json              # raw API format (default)
+o2 create template -f template.yaml --crd        # Kubernetes CRD format
 o2 list template
 o2 delete template MyTemplate
 ```
 
 ### Destinations
 ```bash
-o2 create dest -f destination.yaml
+o2 create dest -f destination.json               # raw API format (default)
+o2 create dest -f destination.yaml --crd         # Kubernetes CRD format
 o2 list dest --type http
 o2 delete dest my-destination
 ```
 
 ### Dashboards
 ```bash
-o2 create dashboard -f dashboard.yaml
+o2 create dashboard -f dashboard.json            # raw API format (default)
+o2 create dashboard -f dashboard.json --folder production  # override folder
+o2 create dashboard -f dashboard.yaml --crd      # Kubernetes CRD format
 o2 list dashboard --folder production
-o2 delete dashboard 7417863561566760960  # Use ID from list
+o2 delete dashboard 7417863561566760960          # Use ID from list
 ```
 
 ### Pipelines
 ```bash
-o2 create pipeline -f pipeline.yaml
+o2 create pipeline -f pipeline.json              # raw API format (default)
+o2 create pipeline -f pipeline.yaml --crd        # Kubernetes CRD format
 o2 list pipeline
 o2 delete pipeline my-pipeline
 ```
 
 ### Functions
 ```bash
-o2 create function -f function.yaml
+o2 create function -f function.json              # raw API format (default)
+o2 create function -f function.yaml --crd        # Kubernetes CRD format
 o2 list function
 o2 delete function my-function
 ```
 
 ### Alerts
 ```bash
-o2 create alert -f alert.yaml
+o2 create alert -f alert.json                    # raw API format (default)
+o2 create alert -f alert.json --folder my-team   # override folder
+o2 create alert -f alert.yaml --crd              # Kubernetes CRD format
+o2 create alert -f alert.yaml --crd --folder my-team
 o2 list alert --folder test_alerts --enabled-only
 o2 get alert my-alert
 o2 update alert -f updated-alert.yaml
@@ -417,14 +448,21 @@ O2 CLI is production-ready for:
 
 ## 🔗 Related Tools
 
-**Kubernetes Operator:** For GitOps and declarative management
+**Kubernetes Operator:** For GitOps and declarative management (CRD format)
 ```bash
 kubectl apply -f dashboard.yaml
 ```
 
-**O2 CLI:** For direct management and scripting
+**O2 CLI — Raw API format** (default): use JSON exported directly from OpenObserve
 ```bash
-o2 create dashboard -f dashboard.yaml
+o2 create dashboard -f dashboard.json
+o2 create alert -f alert.json --folder my-team
+```
+
+**O2 CLI — CRD format**: use the same YAML files as the Kubernetes Operator
+```bash
+o2 create dashboard -f dashboard.yaml --crd
+o2 create alert -f alert.yaml --crd --folder my-team
 ```
 
 **Use both together for complete OpenObserve management!**

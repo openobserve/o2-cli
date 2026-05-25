@@ -9,7 +9,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveFunction
+kind: Function
 metadata:
   name: intentional-test-failure
   namespace: o2operator

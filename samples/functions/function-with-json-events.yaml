@@ -7,7 +7,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveFunction
+kind: Function
 metadata:
   name: json-events-example
   namespace: o2operator
@@ -69,7 +69,7 @@ spec:
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveFunction
+kind: Function
 metadata:
   name: generated-json-test
   namespace: o2operator
@@ -110,7 +110,7 @@ spec:
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveFunction
+kind: Function
 metadata:
   name: complex-json-test
   namespace: o2operator

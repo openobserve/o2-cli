@@ -8,7 +8,7 @@ Sample pipeline configurations for O2 CLI.
 
 ```yaml
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObservePipeline
+kind: Pipeline
 metadata:
   name: my-pipeline
   namespace: o2operator

@@ -4,7 +4,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveAlertTemplate
+kind: AlertTemplate
 metadata:
   name: email-alert-template     # Kubernetes resource name (lowercase, alphanumeric, hyphens)
   namespace: o2operator          # Target namespace for the alert template resource

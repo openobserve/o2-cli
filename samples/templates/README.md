@@ -27,7 +27,7 @@ Full Kubernetes resource with metadata:
 
 ```yaml
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveAlertTemplate
+kind: AlertTemplate
 metadata:
   name: my-template
   namespace: o2operator
@@ -112,7 +112,7 @@ o2 template create -f http-slack-webhook-template.yaml
 
 ```yaml
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveAlertTemplate
+kind: AlertTemplate
 metadata:
   name: my-template
   namespace: o2operator

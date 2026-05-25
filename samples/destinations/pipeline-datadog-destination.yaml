@@ -4,7 +4,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveDestination
+kind: Destination
 metadata:
   name: datadog-pipeline-dest
   namespace: o2operator

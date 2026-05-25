@@ -4,7 +4,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveFunction
+kind: Function
 metadata:
   name: advanced-k8s-processor        # Kubernetes resource name
   namespace: o2operator              # Target namespace for the function resource

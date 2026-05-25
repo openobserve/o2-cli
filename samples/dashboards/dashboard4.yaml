@@ -12,7 +12,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveDashboard
+kind: Dashboard
 metadata:
   name: dashboard4   # Kubernetes resource name
   namespace: o2operator              # Target namespace

@@ -339,7 +339,7 @@ o2 alert create -f alert.yaml          # Alternative
 **YAML Format:**
 ```yaml
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveAlert
+kind: Alert
 metadata:
   name: my-alert
   namespace: o2operator

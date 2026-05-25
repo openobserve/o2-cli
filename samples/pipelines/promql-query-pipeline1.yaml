@@ -4,7 +4,7 @@
 # ============================================================================
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObservePipeline
+kind: Pipeline
 metadata:
   name: promql-query-pipeline1  # Kubernetes resource name (lowercase, alphanumeric, hyphens)
   namespace: o2operator           # Target namespace for the pipeline resource

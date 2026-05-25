@@ -6,7 +6,7 @@
 
 
 apiVersion: openobserve.ai/v1alpha1
-kind: OpenObserveAlert
+kind: Alert
 metadata:
   name: scheduled-custom-alert1  # Kubernetes resource name (lowercase, alphanumeric, hyphens)
   namespace: o2operator       # Target namespace for the alert resource
