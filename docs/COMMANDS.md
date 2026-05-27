@@ -16,6 +16,10 @@ Version: 1.0.0
 - [Update Commands](#update-commands)
 - [Delete Commands](#delete-commands)
 - [Resource-Specific Commands](#resource-specific-commands)
+- [Alert-Specific Commands](#alert-specific-commands)
+  - [import-prometheus](#o2-alert-import-prometheus)
+  - [export-prometheus](#o2-alert-export-prometheus)
+  - [generate-k8s](#o2-alert-generate-k8s)
 
 ---
 
@@ -328,12 +332,17 @@ o2 create organization "Development Org" --identifier dev_org
 
 **Usage:**
 ```bash
-o2 create alert -f alert.yaml
-o2 alert create -f alert.yaml          # Alternative
+o2 create alert -f alert.json                    # raw API format (default)
+o2 create alert -f alert.json --folder my-team   # override folder
+o2 create alert -f alert.yaml --crd              # Kubernetes CRD format
+o2 create alert -f alert.yaml --crd --folder my-team
+o2 alert create -f alert.yaml                    # Alternative syntax
 ```
 
 **Flags:**
-- `-f, --file <path>` - Alert YAML file (required)
+- `-f, --file <path>` - Alert file (required)
+- `--crd` - Parse file as Kubernetes CRD format (default: raw OpenObserve API JSON)
+- `--folder <name>` - Override the target folder (overrides folder in file)
 - All global flags
 
 **YAML Format:**
@@ -376,12 +385,14 @@ spec:
 
 **Usage:**
 ```bash
-o2 create template -f template.yaml
-o2 template create -f template.yaml    # Alternative
+o2 create template -f template.json           # raw API format (default)
+o2 create template -f template.yaml --crd     # Kubernetes CRD format
+o2 template create -f template.yaml           # Alternative syntax
 ```
 
 **Flags:**
-- `-f, --file <path>` - Template YAML file (required)
+- `-f, --file <path>` - Template file (required)
+- `--crd` - Parse file as Kubernetes CRD format (default: raw OpenObserve API JSON)
 - All global flags
 
 **YAML Format (Simple):**
@@ -402,12 +413,14 @@ isBody: true
 
 **Usage:**
 ```bash
-o2 create dest -f destination.yaml
-o2 dest create -f destination.yaml     # Alternative
+o2 create dest -f destination.json           # raw API format (default)
+o2 create dest -f destination.yaml --crd     # Kubernetes CRD format
+o2 dest create -f destination.yaml           # Alternative syntax
 ```
 
 **Flags:**
-- `-f, --file <path>` - Destination YAML file (required)
+- `-f, --file <path>` - Destination file (required)
+- `--crd` - Parse file as Kubernetes CRD format (default: raw OpenObserve API JSON)
 - All global flags
 
 **YAML Format (Simple):**
@@ -428,15 +441,15 @@ template: "slack-alert"
 
 **Usage:**
 ```bash
-o2 create pipeline -f pipeline.yaml
-o2 pipeline create -f pipeline.yaml    # Alternative
+o2 create pipeline -f pipeline.json           # raw API format (default)
+o2 create pipeline -f pipeline.yaml --crd     # Kubernetes CRD format
+o2 pipeline create -f pipeline.yaml           # Alternative syntax
 ```
 
 **Flags:**
-- `-f, --file <path>` - Pipeline YAML file (required)
+- `-f, --file <path>` - Pipeline file (required)
+- `--crd` - Parse file as Kubernetes CRD format (default: raw OpenObserve API JSON)
 - All global flags
-
-**Note:** Uses full Kubernetes YAML format
 
 ---
 
@@ -475,12 +488,14 @@ o2 create folder Monitoring --type dashboards
 
 **Usage:**
 ```bash
-o2 create function -f function.yaml
-o2 function create -f function.yaml    # Alternative
+o2 create function -f function.json           # raw API format (default)
+o2 create function -f function.yaml --crd     # Kubernetes CRD format
+o2 function create -f function.yaml           # Alternative syntax
 ```
 
 **Flags:**
-- `-f, --file <path>` - Function YAML file (required)
+- `-f, --file <path>` - Function file (required)
+- `--crd` - Parse file as Kubernetes CRD format (default: raw OpenObserve API JSON)
 - All global flags
 
 **YAML Format (Simple):**
@@ -500,15 +515,18 @@ function: |
 
 **Usage:**
 ```bash
-o2 create dashboard -f dashboard.yaml
-o2 dashboard create -f dashboard.yaml  # Alternative
+o2 create dashboard -f dashboard.json                    # raw API format (default)
+o2 create dashboard -f dashboard.json --folder prod      # override folder
+o2 create dashboard -f dashboard.yaml --crd              # Kubernetes CRD format
+o2 create dashboard -f dashboard.yaml --crd --folder prod
+o2 dashboard create -f dashboard.yaml                    # Alternative syntax
 ```
 
 **Flags:**
-- `-f, --file <path>` - Dashboard YAML file (required)
+- `-f, --file <path>` - Dashboard file (required)
+- `--crd` - Parse file as Kubernetes CRD format (default: raw OpenObserve API JSON)
+- `--folder <name>` - Override the target folder
 - All global flags
-
-**Note:** Uses full Kubernetes YAML format
 
 ---
 
@@ -551,11 +569,13 @@ Dashboards: 4
 **Usage:**
 ```bash
 o2 get alert my-alert
-o2 alert get my-alert                    # Alternative
-o2 get alert my-alert --output yaml      # Export format
+o2 get alert my-alert --folder production
+o2 get alert my-alert --output yaml      # Export as YAML
+o2 alert get my-alert                    # Alternative syntax
 ```
 
 **Flags:**
+- `--folder <name>` - Folder to search (optional; service accounts may need this)
 - All global flags
 
 ---
@@ -904,12 +924,14 @@ o2 folder delete 7417863561566760960 --type reports
 ```bash
 o2 delete function my-function          # By name
 o2 delete function -f function.yaml     # From file
+o2 delete function my-function --force  # Skip confirmation
 o2 function delete my-function          # Alternative
 ```
 
 **Flags:**
 - `[function-name]` - Function name OR
 - `-f, --file <path>` - Extract name from file
+- `--force` - Skip confirmation prompt
 - All global flags
 
 ---
@@ -936,6 +958,235 @@ o2 dashboard delete 7417863561566760960         # Alternative
 ---
 
 ## 🔧 Alert-Specific Commands
+
+### `o2 alert import-prometheus`
+
+**Description:** Import Prometheus alerting rules as OpenObserve PromQL alerts. Reads alerting rules from a local Prometheus rule file, a live Prometheus `/api/v1/rules` endpoint, or both. Recording rules are skipped automatically.
+
+**Usage:**
+```bash
+# From a local Prometheus rules YAML file
+o2 alert import-prometheus -f rules.yaml --destination my-slack
+
+# From a live Prometheus instance
+o2 alert import-prometheus --prometheus-url http://prometheus:9090 --destination my-slack
+
+# Combine both sources (rules are merged)
+o2 alert import-prometheus -f extra-rules.yaml --prometheus-url http://prometheus:9090 --destination my-slack
+
+# Preview without creating (dry run)
+o2 alert import-prometheus -f rules.yaml --destination my-slack --dry-run
+
+# Full example with all options
+o2 alert import-prometheus \
+  -f rules.yaml \
+  --destination my-slack \
+  --destination pagerduty \
+  --folder imported \
+  --stream my_metrics \
+  --stream-type metrics
+```
+
+**Flags:**
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--file <path>` | `-f` | | Prometheus rules YAML file (at least one of `--file` or `--prometheus-url` required) |
+| `--prometheus-url <url>` | | | Prometheus base URL, e.g. `http://prometheus:9090` |
+| `--destination <name>` | | | Notification destination (required, repeatable for multiple) |
+| `--folder <name>` | | `default` | Folder to place imported alerts in |
+| `--stream <name>` | | `default` | Stream name to monitor |
+| `--stream-type <type>` | | `metrics` | Stream type: `metrics`, `logs`, or `traces` |
+| `--dry-run` | | `false` | Print what would be created without making any changes |
+| All global flags | | | |
+
+**Rule mapping:**
+
+| Prometheus field | OpenObserve field | Notes |
+|-----------------|-------------------|-------|
+| `alert` | `name` | Sanitized: special chars → `_` |
+| `expr` | `query_condition.promql` | Full PromQL expression |
+| `for` | `trigger_condition.period` | Converted to minutes; defaults to 15m |
+| `labels` | `context_attributes` | All labels become context attributes |
+| `annotations.summary` | `description` | Falls back to `annotations.description` |
+
+**Prometheus rule file format:**
+```yaml
+groups:
+  - name: infra
+    rules:
+      - alert: HighCPU
+        expr: avg(rate(cpu_seconds_total[5m])) > 0.8
+        for: 10m
+        labels:
+          severity: critical
+          team: platform
+        annotations:
+          summary: "CPU usage is critically high"
+      - record: instance:cpu:rate5m   # recording rules are skipped
+        expr: rate(cpu_seconds_total[5m])
+```
+
+**Trigger condition defaults:**
+
+| Field | Default |
+|-------|---------|
+| Frequency | 5 minutes |
+| Period | From `for` duration (minimum 15m) |
+| Silence | 30 minutes |
+| Threshold | 1 |
+| Operator | `>=` |
+| Timezone | UTC |
+
+**Notes:**
+- Recording rules (those with `record:` instead of `alert:`) are always skipped
+- Alert names are sanitized to match OpenObserve's `^[a-zA-Z0-9_-]+$` pattern
+- Prometheus duration units supported: `ms`, `s`, `m`, `h`, `d`, `w`, `y`
+- Use `--dry-run` to validate your rule file before importing
+- Both `--file` and `--prometheus-url` can be used together; rules from both sources are merged
+
+---
+
+### `o2 alert export-prometheus`
+
+**Description:** Download all alerting rules from a live Prometheus instance and save them to a local YAML file. Recording rules are included. The output file is compatible with the Prometheus rule file format and can be used as input to `import-prometheus` or `generate-k8s`.
+
+**Usage:**
+```bash
+# Export to default file (prometheus-rules.yaml)
+o2 alert export-prometheus --prometheus-url http://prometheus:9090
+
+# Export to a specific file
+o2 alert export-prometheus --prometheus-url http://prometheus:9090 -f /tmp/rules.yaml
+
+# Export from a remote instance
+o2 alert export-prometheus --prometheus-url https://perf-prom.internal.example.com -f exported-rules.yaml
+```
+
+**Flags:**
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--prometheus-url <url>` | | | Prometheus base URL, e.g. `http://prometheus:9090` (required) |
+| `--output-file <path>` | `-f` | `prometheus-rules.yaml` | Output file path |
+| All global flags | | | |
+
+**Notes:**
+- Connects to the Prometheus `/api/v1/rules?type=alert` endpoint (no authentication required by default)
+- The output is a valid Prometheus rule file (can be passed back to `import-prometheus` or `generate-k8s`)
+- Use `--prometheus-url` without a trailing slash
+
+---
+
+### `o2 alert generate-k8s`
+
+**Description:** Convert Prometheus alerting rules into `OpenObserveAlert` Kubernetes CRD manifests compatible with the O2 operator. Reads rules from a local file, a live Prometheus instance, or both. Output is written to stdout (or a file) as a multi-document YAML that can be applied directly with `kubectl apply`.
+
+**Usage:**
+```bash
+# Generate from a local rules file (stdout)
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account
+
+# Generate from a live Prometheus instance
+o2 alert generate-k8s --prometheus-url http://prometheus:9090 --destination my-slack --config-ref openobserve-account
+
+# Pipe directly to kubectl
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account | kubectl apply -f -
+
+# Write to file and apply separately
+o2 alert generate-k8s \
+  -f rules.yaml \
+  --destination my-slack \
+  --config-ref openobserve-account \
+  --namespace o2operator \
+  --folder PromethusRules \
+  --output-file /tmp/o2-alerts-k8s.yaml
+kubectl apply -f /tmp/o2-alerts-k8s.yaml
+
+# Multiple destinations
+o2 alert generate-k8s \
+  -f rules.yaml \
+  --destination my-slack \
+  --destination pagerduty \
+  --config-ref openobserve-account \
+  --org myorg
+```
+
+**Flags:**
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--file <path>` | `-f` | | Prometheus rules YAML file (at least one of `--file` or `--prometheus-url` required) |
+| `--prometheus-url <url>` | | | Prometheus base URL, e.g. `http://prometheus:9090` |
+| `--destination <name>` | | | Notification destination name (required, repeatable for multiple) |
+| `--config-ref <name>` | | `openobserve-account` | Name of the `OpenObserveConfig` Kubernetes resource to reference |
+| `--namespace <name>` | | `o2operator` | Kubernetes namespace for the generated `Alert` resources |
+| `--folder <name>` | | `default` | `folderName` in the CRD spec |
+| `--stream <name>` | | | Stream name (auto-detected from PromQL expression if not set) |
+| `--org <name>` | | | OpenObserve organization (uses ConfigRef default if not set) |
+| `--output-file <path>` | | | Write output to file instead of stdout |
+| All global flags | | | |
+
+**Generated CRD structure:**
+```yaml
+apiVersion: openobserve.ai/v1alpha1
+kind: Alert
+metadata:
+  name: high-cpu-usage          # K8s-safe name derived from alert name
+  namespace: o2operator
+spec:
+  configRef:
+    name: openobserve-account
+    namespace: o2operator
+  name: HighCPUUsage
+  enabled: true
+  streamName: cpu_seconds_total  # Auto-detected from PromQL expression
+  streamType: metrics
+  isRealTime: false
+  folderName: default
+  queryCondition:
+    type: promql
+    promql: avg(rate(cpu_seconds_total[5m])) > 0.8
+    promqlCondition:
+      column: value
+      operator: ">="
+      value: 0
+      ignoreCase: false
+  triggerCondition:
+    frequency: 5
+    frequencyType: minutes
+    period: 15
+    threshold: 1
+    operator: ">="
+    silence: 30
+    timezone: UTC
+    alignTime: false
+  destinations:
+    - my-slack
+  contextAttributes:            # From Prometheus labels
+    - name: severity
+      key: severity
+      value: critical
+```
+
+**Rule mapping:**
+
+| Prometheus field | CRD field | Notes |
+|-----------------|-----------|-------|
+| `alert` | `metadata.name` + `spec.name` | K8s name is lowercased with hyphens; spec name preserves original |
+| `expr` | `spec.queryCondition.promql` | Full PromQL expression |
+| `for` | `spec.triggerCondition.period` | Converted to minutes; minimum 15m |
+| `labels.*` | `spec.contextAttributes` | All Prometheus labels become context attributes |
+| `annotations.summary` | (not mapped) | Prometheus annotations are not mapped to CRD fields |
+
+**Notes:**
+- Recording rules (those with `record:` instead of `alert:`) are always skipped
+- Stream name is auto-detected from the PromQL expression (first metric name found); rules with no detectable stream are skipped with a warning
+- Use `--stream` to override auto-detection for all rules
+- Kubernetes resource names are lowercased, with non-alphanumeric chars replaced by `-`, truncated to 63 chars
+- Output is multi-document YAML separated by `---`; compatible with `kubectl apply -f`
+
+---
 
 ### `o2 alert enable <name>`
 
@@ -1050,6 +1301,10 @@ o2 pipeline update MyPipeline -f updated.yaml
 # Delete (by name or file)
 o2 delete pipeline my-pipeline
 o2 delete pipeline -f pipeline.yaml
+
+# Coming soon
+# o2 pipeline pause <pipeline-id>
+# o2 pipeline resume <pipeline-id>
 ```
 
 ---
@@ -1076,6 +1331,10 @@ o2 function update MyFunc -f updated.yaml
 # Delete (by name or file)
 o2 delete function my-function
 o2 delete function -f function.yaml
+o2 delete function my-function --force   # skip confirmation
+
+# Coming soon
+# o2 function test <function-name> --test-file input.json
 ```
 
 ---
@@ -1214,27 +1473,43 @@ o2 alert enable my-alert
 o2 alert enable my-alert --folder ProductionAlerts
 o2 alert disable my-alert
 o2 alert disable my-alert --folder ProductionAlerts
+
+# Import from Prometheus (creates alerts in OpenObserve)
+o2 alert import-prometheus -f rules.yaml --destination my-slack
+o2 alert import-prometheus --prometheus-url http://prometheus:9090 --destination my-slack
+o2 alert import-prometheus -f rules.yaml --destination my-slack --folder imported --dry-run
+
+# Export from Prometheus (save rules to local file)
+o2 alert export-prometheus --prometheus-url http://prometheus:9090
+o2 alert export-prometheus --prometheus-url http://prometheus:9090 -f rules.yaml
+
+# Generate Kubernetes CRD manifests from Prometheus rules
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account
+o2 alert generate-k8s --prometheus-url http://prometheus:9090 --destination my-slack --config-ref openobserve-account --output-file alerts.yaml
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account | kubectl apply -f -
 ```
 
 **Important:**
 - Delete accepts alert **name** (e.g., `my-alert`) or **ID** (e.g., `39z0R4KJlK5uyj0it2mmndNP2HC`)
 - Get the name and ID from `o2 list alert`
 - Template must exist before creating alert destination
+- `import-prometheus` skips recording rules and sanitizes alert names automatically
+- `generate-k8s` output can be piped directly to `kubectl apply -f -`
 
 ---
 
 ## 🎯 Complete Command Matrix
 
-| Resource | List | Get | Create | Update | Delete | Enable/Disable |
-|----------|------|-----|--------|--------|--------|----------------|
-| Organizations | ✅ | ✅ (+ summary) | ✅ | N/A | N/A | N/A |
-| Folders | ✅ | ✅ | ✅ | ✅ (by ID) | ✅ (by ID) | N/A |
-| Dashboards | ✅ | ✅ | ✅ | ✅ | ✅ (by ID) | N/A |
-| Alerts | ✅ | ✅ | ✅ | ✅ | ✅ (by name/ID) | ✅ |
-| Templates | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
-| Destinations | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
-| Pipelines | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
-| Functions | ✅ | ✅ | ✅ | ✅ | ✅ | N/A |
+| Resource | List | Get | Create | Update | Delete | Enable/Disable | Prometheus |
+|----------|------|-----|--------|--------|--------|----------------|------------|
+| Organizations | ✅ | ✅ (+ summary) | ✅ | N/A | N/A | N/A | N/A |
+| Folders | ✅ | ✅ | ✅ | ✅ (by ID) | ✅ (by ID) | N/A | N/A |
+| Dashboards | ✅ | ✅ | ✅ | ✅ | ✅ (by ID) | N/A | N/A |
+| Alerts | ✅ | ✅ | ✅ | ✅ | ✅ (by name/ID) | ✅ | import / export / generate-k8s |
+| Templates | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | N/A |
+| Destinations | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | N/A |
+| Pipelines | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | N/A |
+| Functions | ✅ | ✅ | ✅ | ✅ | ✅ | N/A | N/A |
 
 ---
 
@@ -1351,19 +1626,31 @@ o2 update template MyTemplate -f new.yaml    # Explicit name (can differ)
 o2 update dashboard <id> -f updated.yaml
 ```
 
-### YAML Formats
+### File Formats and the `--crd` Flag
 
-**Simple Format** (Templates, Destinations, Functions):
-- Just the resource fields
-- No Kubernetes wrapper
-- 3-5 lines minimum
+All `create` commands accept two file formats:
 
-**Full K8s Format** (Dashboards, Pipelines, or any resource):
-- Complete Kubernetes resource
-- Includes apiVersion, kind, metadata, spec
-- Compatible with kubectl
+**Raw API format** (default — no flag needed):
+- Plain JSON or simple YAML matching the OpenObserve API schema
+- Export directly from OpenObserve UI or `o2 get <resource> -o json`
+- Most concise; no Kubernetes wrapper
 
-**Both formats work!** CLI auto-detects.
+**Kubernetes CRD format** (`--crd` flag required):
+- Full Kubernetes resource with `apiVersion`, `kind`, `metadata`, `spec`
+- Compatible with `kubectl apply` and the O2 operator
+- Use the same files for both CLI and GitOps workflows
+
+```bash
+# Raw API (default)
+o2 create alert -f alert.json
+o2 create template -f template.json
+
+# CRD format
+o2 create alert -f alert.yaml --crd
+o2 create template -f template.yaml --crd
+```
+
+**Auto-detection:** If the file contains `apiVersion:` the CLI automatically treats it as CRD format even without `--crd`. The flag is only strictly needed when a CRD-format file lacks that field.
 
 ---
 

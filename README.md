@@ -58,6 +58,7 @@ O2 CLI requires **OpenObserve Enterprise** edition. It will not work with the co
 - ✅ Auto-defaults for missing fields
 - ✅ Filtering (folder, type, enabled-only)
 - ✅ Organization override
+- ✅ **Prometheus Migration**: Import rules as OpenObserve alerts, export rules to YAML, or generate Kubernetes CRD manifests — all from a local file or live Prometheus instance
 
 ---
 
@@ -261,6 +262,45 @@ o2 get template MyAlert --profile dev -o json > tested.json
 o2 create template -f tested.json --profile prod
 ```
 
+### Migrate from Prometheus
+```bash
+# Dry-run to preview what would be created
+o2 alert import-prometheus -f prometheus-rules.yaml --destination my-slack --dry-run
+
+# Import all alerting rules from a local rules file
+o2 alert import-prometheus -f prometheus-rules.yaml \
+  --destination my-slack \
+  --folder imported-from-prometheus \
+  --stream my_metrics
+
+# Import from a live Prometheus instance
+o2 alert import-prometheus \
+  --prometheus-url http://prometheus:9090 \
+  --destination pagerduty \
+  --folder production-alerts
+
+# Merge rules from both a file and a live instance
+o2 alert import-prometheus \
+  -f extra-rules.yaml \
+  --prometheus-url http://prometheus:9090 \
+  --destination my-slack
+
+# Export Prometheus rules to a local file (for review or offline use)
+o2 alert export-prometheus --prometheus-url http://prometheus:9090 -f rules.yaml
+
+# Generate Kubernetes CRD manifests (for use with O2 operator)
+o2 alert generate-k8s \
+  -f rules.yaml \
+  --destination my-slack \
+  --config-ref openobserve-account \
+  --namespace o2operator \
+  --folder PromethusRules \
+  --output-file alerts-k8s.yaml
+
+# Or pipe directly to kubectl
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account | kubectl apply -f -
+```
+
 ### Cross-Organization Querying
 ```bash
 # List all organizations
@@ -401,6 +441,20 @@ o2 list alert --folder test_alerts --enabled-only
 o2 get alert my-alert
 o2 update alert -f updated-alert.yaml
 o2 delete alert my-alert
+
+# Import from Prometheus (creates alerts in OpenObserve)
+o2 alert import-prometheus -f rules.yaml --destination my-slack
+o2 alert import-prometheus --prometheus-url http://prometheus:9090 --destination my-slack
+o2 alert import-prometheus -f rules.yaml --destination my-slack --folder imported --dry-run
+
+# Export from Prometheus (save rules to local file)
+o2 alert export-prometheus --prometheus-url http://prometheus:9090
+o2 alert export-prometheus --prometheus-url http://prometheus:9090 -f rules.yaml
+
+# Generate Kubernetes CRD manifests (for O2 operator)
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account | kubectl apply -f -
+o2 alert generate-k8s -f rules.yaml --destination my-slack --config-ref openobserve-account --output-file alerts.yaml
 ```
 
 ---
