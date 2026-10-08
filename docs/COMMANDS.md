@@ -20,6 +20,8 @@ Version: 1.0.0
   - [import-prometheus](#o2-alert-import-prometheus)
   - [export-prometheus](#o2-alert-export-prometheus)
   - [generate-k8s](#o2-alert-generate-k8s)
+- [PrometheusRule Commands](#prometheusrule-commands)
+  - [promrule render](#o2-promrule-render)
 
 ---
 
@@ -995,7 +997,7 @@ o2 alert import-prometheus \
 | `--prometheus-url <url>` | | | Prometheus base URL, e.g. `http://prometheus:9090` |
 | `--destination <name>` | | | Notification destination (required, repeatable for multiple) |
 | `--folder <name>` | | `default` | Folder to place imported alerts in |
-| `--stream <name>` | | `default` | Stream name to monitor |
+| `--stream <name>` | | first metric of `expr` that exists | Stream to anchor the alert on; the expression itself decides what is evaluated |
 | `--stream-type <type>` | | `metrics` | Stream type: `metrics`, `logs`, or `traces` |
 | `--dry-run` | | `false` | Print what would be created without making any changes |
 | All global flags | | | |
@@ -1005,10 +1007,15 @@ o2 alert import-prometheus \
 | Prometheus field | OpenObserve field | Notes |
 |-----------------|-------------------|-------|
 | `alert` | `name` | Sanitized: special chars → `_` |
-| `expr` | `query_condition.promql` | Full PromQL expression |
-| `for` | `trigger_condition.period` | Converted to minutes; defaults to 15m |
-| `labels` | `context_attributes` | All labels become context attributes |
-| `annotations.summary` | `description` | Falls back to `annotations.description` |
+| `expr` | `query_condition.promql` | Sent unchanged; every returned series fires its own alert |
+| `for` | `pending_period_sec` | Exact seconds |
+| `labels` | `context_attributes` | All labels become context attributes; `severity` also sets `priority` |
+| `annotations.summary` | `row_template` | `{{ $labels.x }}` → `{x}`, `{{ $value }}` → `{value}` |
+| `annotations.description` | `description` | Falls back to `annotations.summary` |
+| other annotations | `context_attributes` | `runbook_url` also sets the alert's runbook link |
+
+Import uses the same translation as the operator's `PrometheusRuleBinding`; see
+[`o2 promrule render`](#o2-promrule-render) for the full mapping.
 
 **Prometheus rule file format:**
 ```yaml
@@ -1031,12 +1038,11 @@ groups:
 
 | Field | Default |
 |-------|---------|
-| Frequency | 5 minutes |
-| Period | From `for` duration (minimum 15m) |
-| Silence | 30 minutes |
-| Threshold | 1 |
-| Operator | `>=` |
-| Timezone | UTC |
+| Frequency | 1 minute |
+| Period (look-back) | 1 minute |
+| Silence | 0 |
+| Threshold | 1 series |
+| Per-series alerting | on |
 
 **Notes:**
 - Recording rules (those with `record:` instead of `alert:`) are always skipped
@@ -1651,6 +1657,32 @@ o2 create template -f template.yaml --crd
 ```
 
 **Auto-detection:** If the file contains `apiVersion:` the CLI automatically treats it as CRD format even without `--crd`. The flag is only strictly needed when a CRD-format file lacks that field.
+
+---
+
+## PrometheusRule Commands
+
+### `o2 promrule render`
+
+**Description:** Print the OpenObserve alert payloads a `PrometheusRuleBinding` would apply, without contacting OpenObserve. Use it to review a rule change in a pull request.
+
+**Usage:**
+```bash
+# PrometheusRule objects (multi-document YAML) or a plain Prometheus rules file
+o2 promrule render -f rules.yaml --binding binding.yaml
+
+# Without a binding: no destinations, default folder
+o2 promrule render -f rules.yaml
+```
+
+**Flags:**
+
+| Flag | Short | Default | Description |
+|------|-------|---------|-------------|
+| `--file <path>` | `-f` | | PrometheusRule YAML or a Prometheus rules file (required) |
+| `--binding <path>` | | | PrometheusRuleBinding YAML supplying destinations, folder and defaults |
+
+**Output:** JSON with one entry per alerting rule (`rule`, `group`, `alert`, `key`, `folder`, `payload`, `warnings`), plus `failures`, group-level `warnings` and `recording_rules_skipped`. The stream name is shown as `<resolved at apply>` because it depends on the streams in the target org.
 
 ---
 
