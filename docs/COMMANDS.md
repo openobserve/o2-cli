@@ -1012,6 +1012,7 @@ o2 alert import-prometheus \
 | `labels` | `context_attributes` | All labels become context attributes; `severity` also sets `priority` |
 | `annotations.summary` | `row_template` | `{{ $labels.x }}` → `{x}`, `{{ $value }}` → `{value}` |
 | `annotations.description` | `description` | Falls back to `annotations.summary` |
+| `openobserve_*` / `openobserve.io/*` annotations | alert settings | Silence, period, frequency, per-series, dedup fields, notify-on-recovery, priority; always applied, not copied to context |
 | other annotations | `context_attributes` | `runbook_url` also sets the alert's runbook link |
 
 Import uses the same translation as the operator's `PrometheusRuleBinding`; see
@@ -1683,6 +1684,8 @@ o2 promrule render -f rules.yaml
 | `--binding <path>` | | | PrometheusRuleBinding YAML supplying destinations, folder and defaults |
 
 **Output:** JSON with one entry per alerting rule (`rule`, `group`, `alert`, `key`, `folder`, `payload`, `warnings`), plus `failures`, group-level `warnings` and `recording_rules_skipped`. The stream name is shown as `<resolved at apply>` because it depends on the streams in the target org.
+
+A rule's settings annotations (`openobserve_*` or `openobserve.io/*`: silence, period, frequency, per-series, dedup fields, notify-on-recovery, priority) are applied here exactly as the operator applies them, unless the binding sets `ruleAnnotations: Ignore`.
 
 ---
 
