@@ -4,7 +4,7 @@
 
 Version: 1.1.3 | Status: Production-Ready ✅
 
-⚠️ **Requires OpenObserve Enterprise** - O2 CLI only works with OpenObserve Enterprise edition.
+⚠️ **Requires OpenObserve Enterprise or OpenObserve Cloud** - O2 CLI does not work with the open-source edition.
 
 ---
 
@@ -26,8 +26,8 @@ Version: 1.1.3 | Status: Production-Ready ✅
 
 O2 CLI is a command-line interface for managing OpenObserve resources directly, similar to AWS CLI or kubectl. It provides an imperative way to manage OpenObserve alongside the declarative Kubernetes Operator.
 
-**⚠️ Enterprise Requirement:**
-O2 CLI requires **OpenObserve Enterprise** edition. It will not work with the community version. For Enterprise access, visit [openobserve.ai/pricing](https://openobserve.ai/pricing).
+**⚠️ Edition Requirement:**
+O2 CLI works with **OpenObserve Enterprise** (self-hosted) and **OpenObserve Cloud**. It will not work with the open-source edition. For Enterprise or Cloud access, visit [openobserve.ai/pricing](https://openobserve.ai/pricing).
 
 **Why O2 CLI?**
 - ✅ Direct management without Kubernetes
@@ -95,8 +95,8 @@ sudo mv o2 /usr/local/bin/
 ## 🚀 Quick Start
 
 ### Prerequisites
-- OpenObserve Enterprise instance
-- Valid credentials (username/password or API token)
+- OpenObserve Enterprise instance or OpenObserve Cloud organization
+- Valid credentials (username/password or service account token)
 
 ### 1. Configure
 ```bash
@@ -109,7 +109,21 @@ o2 configure --profile dev
 o2 configure --profile prod
 ```
 
-**Note:** The CLI will validate your OpenObserve instance is Enterprise edition on first command.
+**Note:** Every command that talks to OpenObserve checks that the instance's `build_type` (from `GET /config`) is `enterprise` or `cloud` before running.
+
+#### Connecting to OpenObserve Cloud
+Cloud uses SSO, so configure the profile with a service account:
+
+```bash
+o2 configure --profile cloud
+# Endpoint:      https://api.openobserve.ai
+# Organization:  your organization identifier (e.g. 2Ab3Cd4Ef5Gh6Ij7Kl8Mn9Op0Qr); the display name also resolves
+# Username:      the service account email
+# Account type:  2 (Service account)
+# Token:         the service account token
+```
+
+The service account needs a role with access to the resources you manage; without one, commands fail with `403 Unauthorized Access`.
 
 ### 2. List Resources
 ```bash
